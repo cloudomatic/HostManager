@@ -12,9 +12,9 @@
 
   [UI](https://github.com/cloudomatic/HostManager/blob/develop/ui/src/HostManagerUI.js) - React (create-react-app, Material UI v5)
 
-  [API](https://github.com/cloudomatic/HostManager/blob/ui_demo/server/src/main/java/io/hostmanager/ServerController.java) - Java/Grizzly
+  [API](https://github.com/cloudomatic/HostManager/blob/develop/server/src/main/java/io/hostmanager/ServerController.java) - Java/Grizzly
 
-  [Integration Tests](https://github.com/cloudomatic/HostManager/blob/ui_demo/server/src/test/python/IntegrationTests.py) - Python 3.x
+  [Integration Tests](https://github.com/cloudomatic/HostManager/blob/develop/server/src/test/python/IntegrationTests.py) - Python 3.x
 
   # Getting Started:
   
