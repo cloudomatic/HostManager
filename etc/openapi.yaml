@@ -2,6 +2,7 @@ openapi: 3.0.0
 info:
   title: HostManager API
   version: 1.0.0
+  description: An API for running commands on, and retrieving files from the local host where the API runs
 servers:
   - url: https://{server}/api/v1
 components:
@@ -80,5 +81,31 @@ paths:
                   cwd: "/"
                   id: "001"
                   command: "ls -l /"
-
+  /files:
+    get:
+      operationId: getFiles
+      summary: Get information about a file or folder
+      security:
+        - basicAuth: []
+      responses:
+        '200':
+          description: The contents of a folder, or metadata about a specific file
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    description: "The command response string buffer with \n separators"
+                    type: string
+                  thumbnail:
+                    description: "A base64 encoded PNG thumbnail of the file (i.e. an icon)"
+                    type: string
+                  size:
+                    type: string
+                    description: "File size in b or Kb"
+              example:
+                type: "image"
+                thumbnail: "c29tZWltYWdl"
+                size: "20Kb"
 
