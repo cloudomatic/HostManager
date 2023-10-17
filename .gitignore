@@ -1,0 +1,12 @@
+.DS_Store
+server/.DS_Store
+server/target/
+ui/.DS_Store
+ui/build/
+ui/node_modules
+ui/nohup.out
+ui/src/.DS_Store
+ui/src/test.html
+ui/yarn.lock
+yarn.lock
+
