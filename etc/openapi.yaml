@@ -53,10 +53,10 @@ paths:
                 cwd:
                   type: string
                   description: "The command's current working directory"
-              example:
-                cwd: /
-                id: '001'
-                command: ls -l /nothing
+            example:
+              cwd: /
+              id: '001'
+              command: ls -l /nothing
       responses:
         '200':
           description: Command executed successfully

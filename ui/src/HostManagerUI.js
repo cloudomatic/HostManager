@@ -83,7 +83,7 @@ export default function HostManager() {
 
   if ((currentlySelectedPage != null) && (pageNameFromUrl != currentlySelectedPage)) {
     var existingQueryString = ""
-    window.history.pushState(null, null, "/?c=" + currentlySelectedPage + existingQueryString)
+    window.history.pushState(null, null, "?c=" + currentlySelectedPage + existingQueryString)
   }
 
 
