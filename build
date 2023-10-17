@@ -34,6 +34,8 @@ package() {
   yarn build
   cd /src/server
   mvn package
+
+  # https://raw.githack.com/cloudomatic/HostManager/ui_demo/demo/index.html
 }
 
 #
