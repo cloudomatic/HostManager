@@ -1,7 +1,7 @@
 
   A React/Java single-page-app demonstration project, consisting of a browser-based remote access single-host server manager, allowing shell and file view/edit access to the host where the server API executes.
 
-  See the UI [demo](https://raw.githack.com/cloudomatic/HostManager/ui_demo/demo/index.html) and the [API Spec](https://raw.githack.com/cloudomatic/HostManager/etc/spec.html)
+  See the UI [demo](https://raw.githack.com/cloudomatic/HostManager/ui_demo/demo/index.html) and the [API Spec](https://raw.githack.com/cloudomatic/HostManager/main/etc/spec.html)
 
   # System Requirements
 
@@ -16,7 +16,7 @@
 
   [Integration Tests](https://github.com/cloudomatic/HostManager/blob/develop/server/src/test/python/IntegrationTests.py) - Python 3.x
 
-  # Getting Started:
+  # Getting Started
   
     ./build help - See what build options are available
 
