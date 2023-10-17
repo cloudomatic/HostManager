@@ -1,0 +1,286 @@
+#!/bin/bash
+
+project_name="host-manager"
+
+cheat_sheet() {
+ echo -e ""
+ echo -e "Run a unit tests:"
+ echo -e "   cd /src/server; mvn -o test -Dtest=TestApi#testShellCommand\n"
+ echo -e "To rebuild/re-run the Java server, execute:\n"
+ echo -e "   kill -9 \`ps -ef | grep java | grep -v grep | awk '{print $1}' | xargs\`"
+ echo -e "   mvn package"
+ echo -e "   cd /src/server cd /src/server && java -jar /src/server/target/server-1.0.jar\n"
+ echo -e "Check the status of the API service:\n"
+ echo -e "   curl -vks http://localhost/api/v1/status\n"
+ echo -e "Restart the React dev server:\n"
+ echo -e "   kill -9 \`ps -ef | grep node | grep -v grep | awk '{print $1}' | xargs\`"
+ echo -e "   cd /src/ui && nohup yarn start &\n"
+ echo ""
+}
+
+#
+# Build a development image, to speed up launches of a development container
+#
+development_image() {
+  docker build -f ./etc/Dockerfile_dev -t ${project_name}-develop:0.9 .
+}
+
+#
+# Recompile and re-run the API server
+#
+restart_server() {
+  echo "Shutting down server..."
+  kill -9 `ps -ef | grep java | grep jar | grep -v grep | awk '{print $1}'`
+  cd /src/server
+  mvn package -DskipTests
+  echo "Starting API server..."
+  cd /src/server && java -jar /src/server/target/server-1.0.jar
+}
+
+#
+# Run a development container, with React dev server running the UI
+# and a Java server process for the API
+#
+__run_development_container_x() {
+    docker run -it --rm --name ${project_name}-dev-container \
+    -v $(pwd):/src \
+    -p 3000:3000 \
+    -p 443:443 \
+    -p 80:80 \
+    -e ADMIN_USERNAME=admin \
+    -e ADMIN_PASSWORD=admin \
+    alpine:latest sh -c ' \
+      echo cd /src/ui && mkdir /node_modules && \
+      ln -s /node_modules ./node_modules 2>/dev/null; apk update && \
+      apk add python3 py3-pip jq curl git yarn openjdk11 maven && \
+      pip install requests urllib3 && \
+      cd /src/server && mvn package -o && java -jar /src/server/target/server-1.0.jar && \
+      echo yarn install && echo nohup yarn start & && \
+      sh'
+}
+
+#
+# Run the Python-based integration tests against the API server
+#
+run_server_integration_tests() {
+  cd /src/server
+  TRACE=true ./src/test/python/IntegrationTests.py http://localhost
+}
+
+#
+# Test the dev container to see if both API and UI servers are running
+#
+test_development_container() {
+  echo ""
+  echo "Checking the API server:"
+  echo ""
+  if [ `curl -s http://localhost/api/v1/status | grep status | wc -l` -gt 0 ]; then
+    echo "    OK"
+  else
+    echo "    Did not find the API server running via curl -s http://localhost/api/v1/status"
+  fi
+  echo ""
+  echo "Checking the UI server:"
+  echo ""
+  if [ `curl -s http://localhost:3000/index.html | grep "Host Manager" | wc -l` -gt 0 ]; then
+    echo "    OK"
+  else
+    echo "    Did not find the UI running via curl -s http://localhost:3000/index.html"
+  fi
+  echo ""
+}
+
+#
+# Run a development container with the source worktree mounted
+#
+run_development_container() {
+    docker run -it --rm --name ${project_name}-dev-container \
+    -v $(pwd):/src \
+    -p 3000:3000 \
+    -p 443:443 \
+    -p 80:80 \
+    -e ADMIN_USERNAME=admin \
+    -e ADMIN_PASSWORD=admin \
+    -e OFFLINE_MODE=false \
+    alpine:latest sh -c 'apk update && apk add bash && cd /src && ./build setup_development_container && cd /src && ./build start_development_container_services && echo "Connect to http://localhost:3000 to run the desktop, or run \"./build test_dev_container\" to validate the API and UI servers" && sh'
+}
+
+#
+# Start the API (Java) server and the React dev server
+#
+start_development_container_services() {
+  echo "Starting UI dev server..."
+  cd /src/ui && nohup yarn start &
+  echo "Starting API server..."
+  cd /src/server && nohup java -jar /src/server/target/server-1.0.jar &
+  echo "Waiting for servers to start (10 seconds)...."
+  sleep 10
+  test_development_container
+  echo -e "Run\n     ./build cheat_sheet \n\nfor a list of build/deploy options\n"
+}
+
+#
+# Setup a dev container.  Note that this is called from etc/Dockerfile_dev
+#
+setup_development_container() {
+      cd /src/ui
+      #mkdir /src/ui/node_modules
+      mkdir /node_modules
+      ln -s /node_modules /src/ui/node_modules 2>/dev/null
+      apk update
+      apk add bash python3 py3-pip jq curl git yarn openjdk11 maven
+      pip install requests urllib3
+      yarn install
+      cd /src/server
+      mvn package
+}
+
+#
+# Run a development container, in offline mode, with all React/Maven packages
+# pre-installed (run ./build development_image while online to create the image)
+#
+run_offline_development_container() {
+  check_docker
+  check_image ${project_name}-develop 0.9
+  image_missing=$?
+  if [ $image_missing -ne 0 ]; then
+    echo "Docker is not available and/or did not find an image named ${project_name}-develop:1.0.  Launch Docker and run ./build development_image to create it, or run ./build run_development_container."
+    exit 1
+  fi
+  docker run -it --rm --name ${project_name}-develop \
+    -v $(pwd):/src \
+    -p 3000:3000 \
+    -p 443:443 \
+    -p 80:80 \
+    -e ADMIN_USERNAME=admin \
+    -e ADMIN_PASSWORD=admin \
+    -e OFFLINE_MODE=true \
+    ${project_name}-develop:0.9 sh -c "cd /src && ./build start_development_container_services && sh"
+}
+
+#
+# Setup Docker on Raspbian if needed
+#
+setup_docker() {
+  os=`cat /etc/os-release | grep '^NAME=' | cut -f2 -d'='`
+  echo "Detected OS $os"
+  if true; then
+    if false; then
+			# Add Docker's official GPG key:
+			sudo apt-get update
+			sudo apt-get install ca-certificates curl gnupg
+			sudo install -m 0755 -d /etc/apt/keyrings
+			curl -fsSL https://download.docker.com/linux/raspbian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+			sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+			# Set up Docker's Apt repository:
+			echo \
+				"deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/raspbian \
+				"$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+				sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+			sudo apt-get update
+			sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    fi
+    # Alternate method if the above fails
+    if true; then
+			# https://download.docker.com/linux/raspbian/dists/bullseye/pool/stable/armhf/
+      sudo apt-get update
+      sudo apt full-upgrade
+      sudo apt-get install -y vim
+			curl -vks -O https://download.docker.com/linux/raspbian/dists/bullseye/pool/stable/armhf/docker-buildx-plugin_0.11.2-1~raspbian.11~bullseye_armhf.deb
+			curl -vks -O "https://download.docker.com/linux/raspbian/dists/bullseye/pool/stable/armhf/docker-compose-plugin_2.21.0-1~raspbian.11~bullseye_armhf.deb"
+			curl -vks -O "https://download.docker.com/linux/raspbian/dists/bullseye/pool/stable/armhf/docker-ce_24.0.6-1~raspbian.11~bullseye_armhf.deb"
+			curl -vks -O "https://download.docker.com/linux/raspbian/dists/bullseye/pool/stable/armhf/docker-ce-cli_24.0.6-1~raspbian.11~bullseye_armhf.deb"
+			curl -vks -O "https://download.docker.com/linux/raspbian/dists/bullseye/pool/stable/armhf/containerd.io_1.6.24-1_armhf.deb"
+			sudo dpkg -i ./containerd* ./docker-ce_* ./docker-ce-cli* ./docker-buildx* ./docker-compose* 
+      # /boot/config.txt: Rectangular: dtoverlay=vc4-kms-dpi-hyperpixel4
+      # https://github.com/pimoroni/hyperpixel4/issues/177
+      # https://learn.pimoroni.com/article/getting-started-with-hyperpixel-4
+    fi
+  fi
+  sudo docker run -it --rm --name testing_docker_setup alpine:latest sh -c "echo Docker checks out"
+}
+
+test_docker() {
+  sudo docker run -it --rm --name testing_docker_setup alpine:latest "echo Docker checks out"
+}
+
+
+#
+# Check to see if Docker is installed and running
+#
+check_docker() {
+  if [ `docker --version | grep Docker | grep -v grep | wc -l` -ne 1 ]; then
+    echo -e "\n Could not run 'docekr --version'.  This program requires Docker to be installed and running on the local host\n"
+    exit 1
+  fi
+}
+
+#
+# Check to see if a Docker image exists
+#
+check_image() {
+  if [ $# -lt 2 ]; then
+    echo -e "\nUsage: ./build check_image <image-name> <tag>\n"
+    exit 1
+  fi
+  image_name=$1
+  image_tag=$2
+  if [ `docker images | grep $image_name | grep " $image_tag" | wc -l` -lt 1 ]; then
+    return 1
+  fi
+  return 0
+}
+
+#
+# Run the program demo
+#
+run_demo() {
+  if `check_image sloadbook 1.0` ; then
+    echo "Image is there"
+  else
+    build_image
+    run_image
+    #test_image
+    echo "The server is running on $hostname:80"
+  fi
+}
+
+#
+# Build a development image
+#
+build_dev_image() {
+  docker build \
+    --build-arg DEV_IMAGE=true \
+    --build-arg IMAGE_TAG=1.0 \
+    -f ./etc/Dockerfile_dev \
+    -t codebook-dev:1.0 .
+}
+
+#
+# Show available commands
+#
+help() {
+  echo ""
+  echo "Usage: "
+  echo ""
+  echo "  build <command>"
+  echo ""
+  echo "Suggestion: "
+  echo ""
+  echo "  ./build run_development_container"
+  echo ""
+  echo "Commands:"
+  echo ""
+  cat $0 | grep '()' | grep -v cat | cut -f1 -d'(' | sed 's/^/  /g'
+  echo ""
+}
+
+#
+# Start of program
+#
+if [ $# -eq 0 ]; then
+  help ""
+else
+  $@
+fi

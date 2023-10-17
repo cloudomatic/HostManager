@@ -1,0 +1,84 @@
+openapi: 3.0.0
+info:
+  title: HostManager API
+  version: 1.0.0
+servers:
+  - url: https://{server}/api/v1
+components:
+  securitySchemes:
+    basicAuth:     
+      type: http
+      scheme: basic
+paths:
+  /status:
+    get:
+      operationId: getStatus
+      summary: Server Status
+      responses:
+        '200':
+          description: Server is active and healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  localtime:
+                    type: string
+                  status:
+                    type: string
+              example:
+                localtime: Sat Apr 01 23:06:24 GMT 2023
+                status: ok
+  /command:
+    post:
+      operationId: executeCommand
+      summary: Execute a command
+      security:
+        - basicAuth: []
+      requestBody:
+        description: A command to execute
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                command:
+                  type: string
+                  description: "A command to execute on the host"
+                id:
+                  type: string
+                  description: "A tracking (unique) ID for the command"
+                cwd:
+                  type: string
+                  description: "The command's current working directory"
+              example:
+                cwd: /
+                id: '001'
+                command: ls -l /nothing
+      responses:
+        '200':
+          description: Command executed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  response:
+                    description: "The command response string buffer with \n separators"
+                    type: string
+                  exitCode:
+                    description: "The exit code from the command execution"
+                    type: string
+                  command:
+                    type: object
+                    description: "The command that was executed"
+              example:
+                response: "No such file or directory"
+                exitCode: 1
+                command:
+                  cwd: "/"
+                  id: "001"
+                  command: "ls -l /"
+
+
