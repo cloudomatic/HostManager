@@ -20,9 +20,20 @@ cheat_sheet() {
 
 #
 # Build a development image, to speed up launches of a development container
+# and enable a developer to work offline
 #
 development_image() {
   docker build -f ./etc/Dockerfile_dev -t ${project_name}-develop:0.9 .
+}
+
+#
+# Compile the React pages to a static single-page-app
+#
+package() {
+  cd /src/ui
+  yarn build
+  cd /src/server
+  mvn package
 }
 
 #
