@@ -131,19 +131,19 @@ function getDemoHostFileSystem() {
             },
             "2021-09-01.png": {
               "type": "image",
-              "thumbnail": "2021-09-01.png",
+              "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/ui_demo/demo/2021-09-01.png",
               "size": "8k"
             }
           },
           "/SecurityCamera002": {
             "2021-09-02.png": {
               "type": "image",
-              "thumbnail": "2021-09-02.png",
+              "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/ui_demo/demo/2021-09-02.png",
               "size": "192k"
             },
             "2021-09-03.png": {
               "type": "image",
-              "thumbnail": "2021-09-03.png",
+              "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/ui_demo/demo/2021-09-03.png",
               "size": "163k"
             }
           },
@@ -152,31 +152,31 @@ function getDemoHostFileSystem() {
           "/Lex" : {
             "Carmack.001.png": {
               "type": "image",
-              "thumbnail": "Carmack.001.png",
+              "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/ui_demo/demo/Carmack.001.png",
               "size": "958k"
             },
             "Carmack.002.png": {
               "type": "image",
-              "thumbnail": "Carmack.002.png",
+              "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/ui_demo/demo/Carmack.002.png",
               "size": "958k"
             },
             "Carmack.003.png": {
               "type": "image",
-              "thumbnail": "Carmack.003.png",
+              "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/ui_demo/demo/Carmack.003.png",
               "size": "958k"
             },
             "Carmack.004.png": {
               "type": "image",
-              "thumbnail": "Carmack.004.png",
+              "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/ui_demo/demo/Carmack.004.png",
               "size": "958k"
             },
             "Lex.001.png": {
               "type": "image",
-              "thumbnail": "Lex.001.png"
+              "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/ui_demo/demo/Lex.001.png"
             },
             "Lex.002.png": {
               "type": "image",
-              "thumbnail": "Lex.002.png",
+              "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/ui_demo/demo/Lex.002.png",
               "size": "958k"
             },
             "transcript.txt": {
@@ -206,7 +206,7 @@ function getDemoHostFileSystem() {
           },
           "icon.png" : {
             "type": "image",
-            "thumbnail": "globe.png",
+            "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/ui_demo/demo/globe.png",
             "size": "958k"
           }
         }
