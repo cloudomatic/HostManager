@@ -45,7 +45,7 @@ public class Api {
     for (String variable : (new String("RELEASE_LABEL IMAGE_TAG VERSION GIT_COMMIT GIT_BRANCH")).split(" ")) {
       if (System.getenv(variable) != null) status.put(variable, System.getenv(variable));
     }
-    status.put("hostname", System.getenv("HOSTNAME"))
+    status.put("hostname", System.getenv("HOSTNAME"));
     /*  Add some basic system metrics
       hostname -i
       free
