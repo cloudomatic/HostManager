@@ -27,15 +27,53 @@ development_image() {
 }
 
 #
-# Compile the React pages to a static single-page-app
+# Test an image of the API service using the integration tests.
 #
-package() {
-  cd /src/ui
-  yarn build
-  cd /src/server
-  mvn package
+test_image() {
+  docker network create testing-the-${project_name}-image >>/dev/null
+  # Select a port not likely to be in use, or use a randomizer to select one
+  port=83
 
-  # https://raw.githack.com/cloudomatic/HostManager/ui_demo/demo/index.html
+  docker run -d --rm --name ${project_name}-test-container \
+    --network testing-the-${project_name}-image \
+    -v $(pwd):/src \
+    -p $port:80 \
+    -e ADMIN_USERNAME=admin \
+    -e ADMIN_PASSWORD=admin \
+    -e OFFLINE_MODE=false \
+    ${project_name}:0.9
+
+  # Run a test container with the integration tests (set TRACE to true for debug info)
+  docker run -it --rm --name ${project_name}-integration-tests \
+    --network testing-the-${project_name}-image \
+    -v $(pwd):/src \
+    -e TRACE=false \
+    -e API_ENDPOINT="http://${project_name}-test-container:$port" \
+    alpine:latest \
+    sh -c 'apk update && apk add python3 bash py3-pip jq curl && pip install requests urllib3 && python3 /src/server/src/test/python/IntegrationTests.py $API_ENDPOINT'
+}
+
+#
+# In production, we will want to have push_image() and promote_image() to promote from the staging image registry to the production registry
+#
+push_image() {
+  echo "There is, at present, no remote image registry to push to.  This step pushes the image to your QA image_repository."
+}
+
+#
+# Create a production-ready Docker image
+#
+build_image() {
+  docker build -f ./Dockerfile -t ${project_name}:0.9 .
+}
+
+#
+# Build the API server jar and static content
+#
+build_artifacts() {
+ docker run -it --rm --name ${project_name}-building-artifacts \
+    -v $(pwd):/src \
+    alpine:latest sh -c 'rm /artifacts.zip >>/dev/null && apk update && apk add bash zip && cd /src && ./build setup_development_container && cd /src/ui && yarn build && cd /src/server && mvn compile assembly:single && cd ./target && mv ./server-1.0-jar-with-dependencies.jar ./server.jar && zip /src/artifacts.zip ./server.jar  && cd /src/ui && mv build wwwroot && zip -r /src/artifacts.zip ./wwwroot'
 }
 
 #
@@ -48,28 +86,6 @@ restart_server() {
   mvn package -DskipTests
   echo "Starting API server..."
   cd /src/server && java -jar /src/server/target/server-1.0.jar
-}
-
-#
-# Run a development container, with React dev server running the UI
-# and a Java server process for the API
-#
-__run_development_container_x() {
-    docker run -it --rm --name ${project_name}-dev-container \
-    -v $(pwd):/src \
-    -p 3000:3000 \
-    -p 443:443 \
-    -p 80:80 \
-    -e ADMIN_USERNAME=admin \
-    -e ADMIN_PASSWORD=admin \
-    alpine:latest sh -c ' \
-      echo cd /src/ui && mkdir /node_modules && \
-      ln -s /node_modules ./node_modules 2>/dev/null; apk update && \
-      apk add python3 py3-pip jq curl git yarn openjdk11 maven && \
-      pip install requests urllib3 && \
-      cd /src/server && mvn package -o && java -jar /src/server/target/server-1.0.jar && \
-      echo yarn install && echo nohup yarn start & && \
-      sh'
 }
 
 #
@@ -141,7 +157,7 @@ setup_development_container() {
       mkdir /node_modules
       ln -s /node_modules /src/ui/node_modules 2>/dev/null
       apk update
-      apk add bash python3 py3-pip jq curl git yarn openjdk11 maven
+      apk add bash python3 py3-pip jq curl git yarn openjdk17 maven
       pip install requests urllib3
       yarn install
       cd /src/server
@@ -243,20 +259,6 @@ check_image() {
     return 1
   fi
   return 0
-}
-
-#
-# Run the program demo
-#
-run_demo() {
-  if `check_image sloadbook 1.0` ; then
-    echo "Image is there"
-  else
-    build_image
-    run_image
-    #test_image
-    echo "The server is running on $hostname:80"
-  fi
 }
 
 #

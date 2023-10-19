@@ -24,7 +24,11 @@
                                         for development, with the current working directory (source worktree)
                                         mounted at /src
 
-    ./build run_server_integration_tests - Run integration tests inside a development container
+    ./build run_server_integration_tests - Run integration tests inside the development container above
+
+  # Deploying To a Docker/Kubernetes Cluster
+
+    ./build build_artifacts && ./build build_image && ./build test_image && <push/deploy this image to your cluster, with a network mapping for port 80>
 
   # Known Issues
 

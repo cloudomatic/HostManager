@@ -1,0 +1,37 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build Artifacts') {
+            steps {
+                sh './build build_artifacts'
+            }
+        }
+        stage('Build Image') {
+            steps {
+                sh './build build_image'
+            }
+        }
+        stage('Test Image') {
+            steps {
+                sh './build test_image'
+            }
+        }
+        stage('Push Image') {
+            steps {
+                sh './build push_image'
+            }
+        }
+        stage('Promote Image') {
+            steps {
+                sh './build promote_image'
+            }
+        }
+        stage('Deploy to QA Cluster') {
+            steps {
+                sh './build deploy qa'
+            }
+        }
+
+    }
+}

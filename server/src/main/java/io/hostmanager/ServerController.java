@@ -32,6 +32,21 @@ public class ServerController {
       return (new JSONObject()).put("error", exception  + "");
     }
 
+    @Path("/files")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response files(
+      @HeaderParam("User-agent") String userAgent,
+      @HeaderParam("Authorization") String authorization,
+      String body
+    ) {
+      try {
+        return Response.status(501).entity((new JSONObject()).put("error", "Not implemented").toString(2) +  "\n").build();
+      } catch (Exception exception) {
+        return Response.status(500).entity(getStandardizedErrorResponse(exception).toString(2) + "\n").build();
+      }
+    }
+
     @Path("/commands")
     @POST
     @Produces(MediaType.APPLICATION_JSON)
@@ -72,4 +87,21 @@ public class ServerController {
         return Response.status(500).entity(getStandardizedErrorResponse(exception).toString(2) + "\n").build();
       }
     }
+
+/*
+    @Path("/")
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response static(
+      @HeaderParam("user-agent") String userAgent
+    ) {
+      ApiResponse response = null;
+      try {
+        response = Api.status(of);
+        return Response.status(response.statusCode).entity(response.body.toString(2) + "\n").build();
+      } catch (Exception exception) {
+        return Response.status(500).entity(getStandardizedErrorResponse(exception).toString(2) + "\n").build();
+      }
+    }
+*/
 }

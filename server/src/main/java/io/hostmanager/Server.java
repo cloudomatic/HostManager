@@ -4,6 +4,7 @@ import io.hostmanager.ServerController;
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+import org.glassfish.grizzly.http.server.StaticHttpHandler;
 import java.net.URI;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,10 +17,9 @@ public class Server {
 
   private static final Logger LOGGER = Logger.getLogger(Server.class.getName());
 
-  public static final String BASE_URI = "http://0.0.0.0:80/";
+  public static final String BASE_URI = "http://0.0.0.0:8080/";
 
   public static HttpServer startServer() {
-    // scan packages
     final ResourceConfig config = new ResourceConfig();
     config.register(ServerController.class);
     LOGGER.info("Starting Server........");
@@ -59,4 +59,5 @@ public class Server {
       Logger.getLogger(Server.class.getName()).log(Level.SEVERE, null, ex);
     }
   }
+  
 }
