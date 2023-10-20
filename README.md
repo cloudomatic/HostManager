@@ -24,7 +24,7 @@
                                         for development, with the current working directory (source worktree)
                                         mounted at /src
 
-    TRACE=true ./build test_api http://localhost:3000 - Run integration tests inside the development container above
+    TRACE=true ./build test_api http://localhost:3000 - Run integration tests against the development container, from the local Docker host
 
   # Deploying to a Kubernetes Cluster
 
