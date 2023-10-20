@@ -1,7 +1,7 @@
 
   A React/Java single-page-app demonstration project, consisting of a browser-based remote access single-host server manager, allowing shell and file view/edit access to the host where the server API executes.
 
-  See the UI [demo](https://raw.githack.com/cloudomatic/HostManager/ui_demo/demo/index.html){:target="_uidemo"} and the [API Spec](https://raw.githack.com/cloudomatic/HostManager/main/etc/spec.html){:target="_spec"}
+  See the UI <a href="https://raw.githack.com/cloudomatic/HostManager/ui_demo/demo/index.html target="_uidemo">demo</a> and the <a href="https://raw.githack.com/cloudomatic/HostManager/main/etc/spec.html" target="_spec">OpenAPI spec</a>.
 
   # System Requirements
 
@@ -28,7 +28,11 @@
 
   # Deploying to a Kubernetes Cluster
 
-    ./build build_artifacts && ./build build_image && ./build test_image && ./build push_image && ./build deploy_to_kubernetes && ./build test_api $url
+    ./build build_artifacts && \
+    ./build build_image && \
+    ./build test_image && \
+    ./build push_image && \
+    ./build deploy_to_kubernetes
     TRACE=true ./build test_api https://endpoint-to-your-running-deployment/
 
   # Known Issues
