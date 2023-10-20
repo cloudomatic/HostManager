@@ -24,11 +24,12 @@
                                         for development, with the current working directory (source worktree)
                                         mounted at /src
 
-    ./build run_server_integration_tests - Run integration tests inside the development container above
+    TRACE=true ./build test_api http://localhost:3000 - Run integration tests inside the development container above
 
-  # Deploying To a Docker/Kubernetes Cluster
+  # Deploying to a Kubernetes Cluster
 
-    ./build build_artifacts && ./build build_image && ./build test_image && <push/deploy this image to your cluster, with a network mapping for port 80>
+    ./build build_artifacts && ./build build_image && ./build test_image && ./build push_image && ./build deploy_to_kubernetes && ./build test_api $url
+    TRACE=true ./build test_api https://endpoint-to-your-running-deployment/
 
   # Known Issues
 

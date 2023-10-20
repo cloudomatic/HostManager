@@ -53,6 +53,7 @@ def test_call(test_id, test_description, path, method, body, expected_response_c
       error(test_id, test_description, f"Key '{expected_response_json_key}' was found in the JSON response, but the value found ({json_response[expected_response_json_key]}) != {expected_response_json_value}", text_response)
     if expected_response_string is not None and str(expected_response_string) not in json.dumps(json_response):
       error(test_id, test_description, f"The expected string value '{expected_response_string}' was not found in the JSON response", text_response)
+    trace(f"!!!!! TEST '{test_id}' PASSED !!!!!")
     return json_response
 
 def error(test_id, test_description, message, text):

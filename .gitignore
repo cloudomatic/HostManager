@@ -10,4 +10,11 @@ ui/src/.DS_Store
 ui/src/test.html
 ui/yarn.lock
 yarn.lock
+artifacts.tar.gz
+artifacts.zip
+*/nohup.out
+server/src/main/java/io/hostmanager/Server.java.1
+ui/nothing.tar
+ui/static/
+ui/wwwroot/
 

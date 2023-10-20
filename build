@@ -1,7 +1,12 @@
 #!/bin/bash
 
 project_name="host-manager"
+image_name=${project_name}:0.9
 
+
+#
+# Give the user some suggestions for running inside a dev container
+#
 cheat_sheet() {
  echo -e ""
  echo -e "Run a unit tests:"
@@ -27,44 +32,84 @@ development_image() {
 }
 
 #
+# Clean up the dev environment
+#
+cleanup() {
+  docker stop host-manager-test-container
+}
+
+#
+# Test the API running at a particular endpoint
+#
+test_api() {
+  api_endpoint=$1
+  if [ -z $api_endpoint ]; then
+    echo -e "\nUsage: $0 test_api https://endpoint-to-your-deployed-api-service\n"
+    exit 1
+  fi
+
+  # Set TRACE=true here to watch the tests run, false for silent mode
+  if (true); then
+    # Run a test container with the integration tests (set TRACE to true for debug info)
+    docker run -it --rm --name ${project_name}-integration-tests \
+      --network host \
+      -v $(pwd):/src \
+      -e TRACE=$TRACE \
+      -e API_ENDPOINT="$api_endpoint" \
+      alpine:latest \
+      sh -c 'apk update && apk add python3 bash py3-pip jq curl && pip install requests urllib3 && python3 /src/server/src/test/python/IntegrationTests.py $API_ENDPOINT'
+  fi
+}
+
+#
 # Test an image of the API service using the integration tests.
 #
 test_image() {
-  docker network create testing-the-${project_name}-image >>/dev/null
+  docker network create testing-the-${project_name}-image >/dev/null 2>&1
   # Select a port not likely to be in use, or use a randomizer to select one
   port=83
 
-  docker run -d --rm --name ${project_name}-test-container \
-    --network testing-the-${project_name}-image \
+  if (true); then
+   docker run -d --rm --name ${project_name}-test-container \
+    --network testing-the-${project_name}-image  \
     -v $(pwd):/src \
     -p $port:80 \
     -e ADMIN_USERNAME=admin \
     -e ADMIN_PASSWORD=admin \
     -e OFFLINE_MODE=false \
-    ${project_name}:0.9
+    $image_name
+  fi
 
-  # Run a test container with the integration tests (set TRACE to true for debug info)
-  docker run -it --rm --name ${project_name}-integration-tests \
-    --network testing-the-${project_name}-image \
-    -v $(pwd):/src \
-    -e TRACE=false \
-    -e API_ENDPOINT="http://${project_name}-test-container:$port" \
-    alpine:latest \
-    sh -c 'apk update && apk add python3 bash py3-pip jq curl && pip install requests urllib3 && python3 /src/server/src/test/python/IntegrationTests.py $API_ENDPOINT'
+  TRACE=true test_api "http://localhost:83"
 }
 
 #
-# In production, we will want to have push_image() and promote_image() to promote from the staging image registry to the production registry
+# Push the image to the non-production registry
 #
 push_image() {
-  echo "There is, at present, no remote image registry to push to.  This step pushes the image to your QA image_repository."
+  echo -e "There is, at present, no remote image registry to push to.  This step pushes the image to your QA image_repository, where it will be available to deployment clusters.\n"
 }
+
+#
+# Promote the image to the production image registry
+#
+promote_image() {
+  echo -e "The promotion function is not yet implemented.  This function would be used to, e.g. perform a security scan (e.g. Veracode) of the image before moving to the production image registry\n"
+} 
 
 #
 # Create a production-ready Docker image
 #
 build_image() {
-  docker build -f ./Dockerfile -t ${project_name}:0.9 .
+  docker build -f ./Dockerfile -t ${image_name} .
+}
+
+#
+# Create a pseudo-Kubernetes cluster using Kind
+#
+create_cluster() {
+  check_for kind
+  kind create cluster
 }
 
 #
@@ -73,7 +118,7 @@ build_image() {
 build_artifacts() {
  docker run -it --rm --name ${project_name}-building-artifacts \
     -v $(pwd):/src \
-    alpine:latest sh -c 'rm /artifacts.zip >>/dev/null && apk update && apk add bash zip && cd /src && ./build setup_development_container && cd /src/ui && yarn build && cd /src/server && mvn compile assembly:single && cd ./target && mv ./server-1.0-jar-with-dependencies.jar ./server.jar && zip /src/artifacts.zip ./server.jar  && cd /src/ui && mv build wwwroot && zip -r /src/artifacts.zip ./wwwroot'
+    alpine:latest sh -c 'rm /src/artifacts.zip >>/dev/null; apk update && apk add bash zip && cd /src && ./build setup_development_container && cd /src/ui && yarn build && cd /src/server && mvn compile assembly:single && cd ./target && mv ./server-1.0-jar-with-dependencies.jar ./server.jar && zip /src/artifacts.zip ./server.jar  && cd /src/ui && mv build wwwroot && zip -r /src/artifacts.zip ./wwwroot'
 }
 
 #
@@ -86,14 +131,6 @@ restart_server() {
   mvn package -DskipTests
   echo "Starting API server..."
   cd /src/server && java -jar /src/server/target/server-1.0.jar
-}
-
-#
-# Run the Python-based integration tests against the API server
-#
-run_server_integration_tests() {
-  cd /src/server
-  TRACE=true ./src/test/python/IntegrationTests.py http://localhost
 }
 
 #
@@ -188,6 +225,92 @@ run_offline_development_container() {
 }
 
 #
+## A visually appealing pause/progress bar
+#
+wait_for() { ##
+  seconds=$1
+  for i in $(seq $seconds); do
+    echo -e ".\c"
+    sleep 1
+  done
+  echo -e "\n"
+}
+
+#
+# Check to see if a command is installed
+#
+check_for() { ##
+  command=$1
+  $command > /dev/null
+  if [ $? -gt 0 ]; then
+    echo -e "\n$command is not installed.  Install a package for $command and re-run."
+    exit 1
+  fi
+}
+
+#
+# Deploy the project image to a Kubernetes cluster.  https://labs.play-with-k8s.com/ is available to test this function.
+# 
+deploy_to_kubernetes() {
+  kubectl get nodes
+  if [ $? -gt 0 ]; then
+    echo -e "\nkubectl is not installed or is not connected to a cluster.  Login to a Kubernetes clusting using kubectl and try the deployment again.\n"
+    exit 1
+  fi
+  namespace=$1
+  release_label=$2
+  image=$3
+  if [ -z $namespace ] || [ -z $release_label ] || [ -z image ]; then
+    echo -e "\nUsage: ./build deploy_to_kubernetes <namespace> <release_label> <image_name>\n"
+    echo -e " e.g.: ./build deploy_to_kubernetes MY-CLUSTER-NAMESPACE dev-1.0.0 $image_name\n"
+    exit 1
+  fi
+  if [ `echo $release_label | grep _ | wc -l` -gt 0 ]; then 
+    echo -e "\nA Kubernetes release label cannot contain underscores.  Try:\n"
+    suggestion=`echo $release_label | sed 's/_/-/g'`
+    echo -e "./build deploy_to_kubernetes $namespace $suggestion $image\n"
+    exit 1
+  fi
+  echo -e "Deploying $image as release label: $release_label in namespace $namespace\c"
+  cat ./etc/k8s.template.yaml | sed "s/\${image_name}/$image/g" | sed "s/\${release_label}/$release_label/g" > /tmp/$release_label.deploy.yaml
+  cat /tmp/$release_label.deploy.yaml
+  kubectl -n $namespace apply -f /tmp/$release_label.deploy.yaml
+  error=$?
+  if [ $error -eq 0 ]; then
+    wait_for 5
+  else
+    echo "build: Received error $error from command: kubectl -n $namespace apply -f /tmp/$release_label.deploy.yaml"
+    cat /tmp/$release_label.deploy.yaml
+    exit 1
+  fi
+  rm /tmp/$release_label.deploy.yaml
+  kubectl -n $namespace get events --sort-by='.lastTimestamp' | tail -5
+}
+
+#
+# Undeploy from kubernetes
+#
+undeploy_from_kubernetes() {
+  namespace=$1
+  release_label=$2
+  if [ -z $namespace ] || [ -z $release_label ]; then
+    echo -e "\nUsage: ./build undeploy_from_kubernetes <namespace> <release_label> <image_name>\n"
+    echo -e " e.g.: ./build undeploy_from_kubernetes MY-CLUSTER-NAMESPACE dev-1.0.0\n"
+    exit 1
+  fi
+  kubectl delete --all -n $namespace -l hostmanager-${release_label}
+  error=$?
+  if [ $error -eq 0 ]; then
+    wait_for 5
+  else
+    echo "build: Received error $error from command: kubectl delete --all -n $namespace -l hostmanager-${release_label}"
+    exit 1
+  fi
+  kubectl -n $namespace get events --sort-by='.lastTimestamp' | tail -5
+}
+
+  
+#
 # Setup Docker on Raspbian if needed
 #
 setup_docker() {
@@ -238,9 +361,9 @@ test_docker() {
 #
 # Check to see if Docker is installed and running
 #
-check_docker() {
+check_docker() { ##
   if [ `docker --version | grep Docker | grep -v grep | wc -l` -ne 1 ]; then
-    echo -e "\n Could not run 'docekr --version'.  This program requires Docker to be installed and running on the local host\n"
+    echo -e "\n Could not run 'docker --version'.  This program requires Docker to be installed and running on the local host\n"
     exit 1
   fi
 }
@@ -253,9 +376,9 @@ check_image() {
     echo -e "\nUsage: ./build check_image <image-name> <tag>\n"
     exit 1
   fi
-  image_name=$1
+  image=$1
   image_tag=$2
-  if [ `docker images | grep $image_name | grep " $image_tag" | wc -l` -lt 1 ]; then
+  if [ `docker images | grep $image | grep " $image_tag" | wc -l` -lt 1 ]; then
     return 1
   fi
   return 0
@@ -287,7 +410,7 @@ help() {
   echo ""
   echo "Commands:"
   echo ""
-  cat $0 | grep '()' | grep -v cat | cut -f1 -d'(' | sed 's/^/  /g'
+  cat $0 | grep -v '##' | grep '()' | grep -v cat | cut -f1 -d'(' | sed 's/^/  /g'
   echo ""
 }
 

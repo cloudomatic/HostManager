@@ -38,7 +38,6 @@ public class ServerController {
     public Response files(
       @HeaderParam("User-agent") String userAgent,
       @HeaderParam("Authorization") String authorization,
-      String body
     ) {
       try {
         return Response.status(501).entity((new JSONObject()).put("error", "Not implemented").toString(2) +  "\n").build();
