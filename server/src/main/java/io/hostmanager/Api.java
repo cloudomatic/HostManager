@@ -45,12 +45,66 @@ public class Api {
     for (String variable : (new String("RELEASE_LABEL IMAGE_TAG VERSION GIT_COMMIT GIT_BRANCH")).split(" ")) {
       if (System.getenv(variable) != null) status.put(variable, System.getenv(variable));
     }
-    status.put("hostname", System.getenv("HOSTNAME"));
-    /*  Add some basic system metrics
-      hostname -i
-      free
-      cat /proc/cpuinfo | grep processor | wc -l
-    */
+    String hostname = null;
+    String ipAddress = null;
+    String memory = null;
+    String cpus = null;
+    String containers = "22";
+    String processes= null;
+    String cpuUtilization = null;
+    String freeMemory = null;
+    
+    Shell shell = new Shell();
+    try {
+      hostname = shell.runCommand(null, "hostname").getResponse().trim();
+    } catch (Exception exception) {
+      hostname = exception + "";
+    }
+    try {
+      if (shell.getOS().equals("mac")) ipAddress = shell.runCommand(null, "ipconfig getifaddr en0").getResponse().trim();
+      else ipAddress = shell.runCommand(null, "hostname -i").getResponse().trim();
+    } catch (Exception exception) {
+      ipAddress = exception + "";
+    }
+    try {
+      if (shell.getOS().equals("mac")) memory = shell.runCommand(null, "sysctl -a | grep memsize | awk '{print $2}'").getResponse().trim();
+      else memory = shell.runCommand(null, "cat /proc/meminfo | grep MemTotal | awk '{print $2}'").getResponse().trim();
+    } catch (Exception exception) {
+      memory = exception + "";
+    }
+    try {
+      if (shell.getOS().equals("mac")) cpus = shell.runCommand(null, "sysctl -a | grep core_count | awk '{print $2}'").getResponse().trim();
+      cpus = shell.runCommand(null, "cat /proc/cpuinfo | grep processor | wc -l").getResponse().trim();
+    } catch (Exception exception) {
+      cpus = exception + "";
+    }
+    try {
+      processes = shell.runCommand(null, "ps -ef | wc -l").getResponse().trim();
+    } catch (Exception exception) {
+      processes = exception + "";
+    }
+    try {
+      if (shell.getOS().equals("mac")) cpuUtilization = shell.runCommand(null, "ps -A -o %cpu | awk '{s+=$1} END {print s}'").getResponse().trim();
+      else cpuUtilization = shell.runCommand(null, "grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'").getResponse().trim();
+    } catch (Exception exception) {
+      cpuUtilization = exception + "";
+    }
+    try {
+      if (shell.getOS().equals("mac")) freeMemory = "Not available (MacOS)";
+      else freeMemory = shell.runCommand(null, "free | grep Mem | awk '{print $6}'").getResponse().trim();
+    } catch (Exception exception) {
+      freeMemory = exception + "";
+    }
+
+    status.put("hostname", hostname);
+    status.put("ipAddress", ipAddress);
+    status.put("memory", memory);
+    status.put("cpus", cpus);
+    status.put("containers", containers);
+    status.put("processes", processes);
+    status.put("cpuUtilization", cpuUtilization);
+    status.put("freeMemory", freeMemory);
+
     return new ApiResponse(
       200, 
       status

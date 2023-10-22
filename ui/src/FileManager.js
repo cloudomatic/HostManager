@@ -77,8 +77,8 @@ export default function FileManager() {
   }
 
   const apiCall=<>curl -ks -X GET \ <br />
-                -H user-agent: host-manager \<br />
-                -H x-api-key: d1e88425-cdc2-4667-8587-05e17941303a \<br />
+                -H User-agent: host-manager \<br />
+                -H Authorization: basic ********** \<br />
                 /api/v1/files{currentFilesystemView}{filePreviewData != null && "/" + Object.keys(filePreviewData)[0] + "?preview=true"}</>
 
  

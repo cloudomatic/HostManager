@@ -94,7 +94,7 @@ export default function Cli(props) {
     else if (command.startsWith("autoComplete:")) {
         commandBody['command'] = "ls " + command.split(":")[1] + "*"
     } else commandBody['command'] = command
-    setCurlCommand("curl -ks -X POST \\ -H \"Authorization: Basic ******** \\ -d '" + JSON.stringify(commandBody) + "' \\ " + window.location.host + "/api/v1/commands")
+    setCurlCommand("curl -ks -X POST \\ -H \"Authorization: Basic ********\" \\ -d '" + JSON.stringify(commandBody) + "' \\ " + window.location.host + "/api/v1/commands")
     if (demoMode) {
       updateScreen(window.fakeCommandProcessor(command))
       window.scrollTo(0, document.body.scrollHeight);

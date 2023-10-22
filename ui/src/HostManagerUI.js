@@ -4,6 +4,7 @@ import AppBarLite from './AppBarLite'
 import CLI from './CLI'
 import EmptyComponent from './EmptyComponent'
 import FileManager from './FileManager'
+import FetchExample from './FetchExample'
 import HostDashboard from './HostDashboard'
 import MobileNavigationPanel from './MobileNavigationPanel'
 import NavigationDrawer from './NavigationDrawer'
@@ -79,6 +80,7 @@ export default function HostManager() {
   else if (currentlySelectedPage == "FileManager") { activeComponent = <FileManager /> }
   else if (currentlySelectedPage == "HostDashboard") { activeComponent = <HostDashboard /> }
   else if (currentlySelectedPage == "SampleExtension") { activeComponent = <SampleExtension /> }
+  else if (currentlySelectedPage == "FetchExample") { activeComponent = <FetchExample /> }
   else { activeComponent = <HostDashboard /> }
 
   if ((currentlySelectedPage != null) && (pageNameFromUrl != currentlySelectedPage)) {
@@ -117,6 +119,7 @@ export default function HostManager() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  document.body.style.backgroundColor=window.getTheme().componentAreaBackgroundColor
   return (
         <div id="app-root-div" style={{backgroundColor: window.getTheme().componentAreaBackgroundColor}}>
             {

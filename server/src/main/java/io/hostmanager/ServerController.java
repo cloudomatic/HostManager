@@ -37,7 +37,7 @@ public class ServerController {
     @Produces(MediaType.APPLICATION_JSON)
     public Response files(
       @HeaderParam("User-agent") String userAgent,
-      @HeaderParam("Authorization") String authorization,
+      @HeaderParam("Authorization") String authorization
     ) {
       try {
         return Response.status(501).entity((new JSONObject()).put("error", "Not implemented").toString(2) +  "\n").build();

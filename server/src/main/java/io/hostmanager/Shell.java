@@ -7,11 +7,33 @@ import io.hostmanager.CommandResponse;
 //
 public class Shell {
 
+  public static String operatingSystem = null;
+
+  //
+  // Get an identifier describing what the local operating system is
+  //
+  public String getOS() {
+    if (operatingSystem != null) return operatingSystem;
+    else {
+      try {
+        operatingSystem = "UNKNOWN";
+        String uname = runCommand(null, "uname").getResponse();
+        String osLabel = uname.toLowerCase().split(" ")[0];
+        if ((new String("darwin mach")).contains(osLabel.toLowerCase())) operatingSystem="mac";
+        else if (osLabel.toLowerCase().contains("linux")) operatingSystem="linux";
+        return operatingSystem;
+      } catch (Exception exception) {
+        return "Unknown OS: " + exception;
+      }
+    }
+  }
+
   //
   // Run a shell command on the local host
   //
   public CommandResponse runCommand(String cwd, String command) throws Exception {
     try {
+      if (cwd == null) cwd = "/";
       io.logger.Logger.log("TRACE", command.toString());
       String[] commandArgs = { "/bin/sh", "-c", command };
       Process process = Runtime.getRuntime().exec(commandArgs, null, new java.io.File(cwd));

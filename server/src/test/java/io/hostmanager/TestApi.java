@@ -16,6 +16,11 @@ public class TestApi {
     Assertions.assertTrue(commandResponse.getResponse().contains("root     root"));
   }
 
+  @Test
+  public void testGetStatus() throws Exception {
+    System.out.println(Api.status(null).getBody().toString(2));
+  }
+
   public static JSONObject toJson(String json) {
     return new JSONObject(json.replace("^", "\""));
   }

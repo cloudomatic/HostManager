@@ -1,10 +1,14 @@
 import * as React from 'react';
+import FetchComponent from './FetchComponent';
 import Text from './Text'
 
 export default function HostDashboard() {
 
   const fontSize = "1.0em"
   const fontSizeMultiplier = 10 
+  
+  // Special flag so that demo mode will work when the api call fails
+  const [apiAvailable, setApiAvailable] = React.useState(false)
 
   const [hostData, setHostData] = React.useState({
     "hostname": "Demo Server",
@@ -20,15 +24,19 @@ export default function HostDashboard() {
     }
   })
 
+
   React.useEffect(() => {
     const timer = setInterval(() => {
-      var _hostData = {...hostData}
-      _hostData.stats['CPU Utilization'] = (10 + Date.now() % 3) + "%"
-      _hostData.stats['Free Memory'] = (400 + Date.now() % 10) + "M"
-      setHostData(_hostData)
+     if (!apiAvailable) {
+				var _hostData = {...hostData}
+				_hostData.stats['CPU Utilization'] = (10 + Date.now() % 3) + "%"
+				_hostData.stats['Free Memory'] = (400 + Date.now() % 10) + "M"
+				setHostData(_hostData)
+      }
     }, 1000);
     return () => clearInterval(timer);
   }, []);
+
 
   const getLeftColumnWidth = () => {
     var longestKeyLength = 0
@@ -46,8 +54,28 @@ export default function HostDashboard() {
     return (8 * longestValueLength) + "px"
   }
 
+  const handleFetchData = (data) => {
+    if (data != null && data.hasOwnProperty('hostname') && !apiAvailable) {
+      setApiAvailable(true)
+    }
+    setHostData({
+			"hostname": "Demo Server",
+			"stats": {
+				"Hostname": data['hostname'],
+				"Address": data['ipAddress'],
+				"Virtual Memory": data['memory'],
+				"CPUs": data['cpus'],
+				"Containers": data['containers'],
+				"Processes": data['processes'],
+				"CPU Utilization": "10%",
+				"Free Memory": data['freeMemory'],
+        "Server Time": data['localtime']
+  	}})
+  }
+
   return (
     <div>
+      <FetchComponent responseCallback={handleFetchData} url={"/api/v1/status_"} method="GET" hideErrorBox={apiAvailable} />
       {/*
               <div id="Title" style={{paddingBottom: "5.0em"}}>
                 <span id="label" style={{ paddingRight: "0.2em"}}>

@@ -109,7 +109,8 @@ build_image() {
 #
 create_cluster() {
   check_for kind
-  kind create cluster
+  kind create cluster -n $project_name-cluster
+  kind load docker-image $image_name
 }
 
 #

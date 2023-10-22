@@ -97,12 +97,6 @@ export default function NavigationDrawer(props) {
         open={open || keepDrawerOpen} 
         onMouseOut={handleDrawerClose}
         onMouseOver={handleDrawerOpen}
-        PaperProps_={{
-          sx: {
-            backgroundColor: "pink",
-            color: "red",
-          }
-        }}
       >
         <div id="div-navigation-panel" style={{ 
                 height: "90%",
