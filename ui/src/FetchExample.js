@@ -24,6 +24,11 @@ export default function FetchExample() {
     setServiceResponse(data)
   }
 
+  React.useEffect(() => {
+    //window.fetchRest("http://localhost:3000/api/v1/status", "get", null, null,  setServiceResponseContent)
+  }, []);
+  
+
   if (serviceResponse != null) {
     return (
       <div style={{ height: "99vh", width: "100%", textAlign: "left"}}>
@@ -34,12 +39,13 @@ export default function FetchExample() {
     )
   } else {
     const useIconMode=false
-    return (<div><FetchComponent responseCallback={setServiceResponseContent} url={"http://localhost:3000/v1/api/status"} iconMode={useIconMode} method="GET" /></div>)
+    //return (<div></div>)
     //return (<div><FetchComponent responseCallback={setServiceResponseContent} url={"http://localhost:3000/api/v1/status"} iconMode={useIconMode} method="GET" /></div>)
+    //return (<div><FetchComponent responseCallback={setServiceResponseContent} url={"http://localhost:3000/v1/api/status"} iconMode={useIconMode} method="GET" /></div>)
     //return (<FetchComponent responseCallback={setServiceResponseContent} url={"http://localhost:3001/api/v1/status"} iconMode={useIconMode} method="GET" />)
     //return (<FetchComponent responseCallback={setServiceResponseContent} url={"http://localhost:3000/api/v1/foobar"} iconMode={useIconMode} method="GET" />)
     //return (<FetchComponent responseCallback={setServiceResponseContent} url={"http://localhost:3000/api/v1/commands"} iconMode={useIconMode} method="GET" requestBody={{ "test": "one"}} />)
     //return (<FetchComponent responseCallback={setServiceResponseContent} url={"http://localhost:3000/api/v1/commands"} iconMode={useIconMode} method="POST" requestBody={{ "test": "one"}} />)
-    //return (<FetchComponent responseCallback={setServiceResponseContent} url={"http://localhost:3000/index.html"} iconMode={useIconMode} method="GET" />)
+    return (<FetchComponent responseCallback={setServiceResponseContent} url={"http://localhost:3000/index.html"} iconMode={useIconMode} method="GET" />)
   }
 }

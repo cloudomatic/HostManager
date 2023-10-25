@@ -31,57 +31,33 @@ export default function FetchComponent(props) {
   // A switch to show the entire error response, as opposed to just a short summary
   const [moreSelected, setMoreSelected] = React.useState(false)
 
+  const fetchDataCallback = (response) => {
+    setRequestInProgress(false)
+    if (response.errorMessage == null) {
+      setServiceResponseCode(response.statusCode)
+      setServiceResponse(response.responseBody)
+      responseCallback(response.responseBody)
+      setServiceErrorResponse(null)
+      setServiceErrorMessage(null)
+    } else {
+      setServiceResponse(null)
+      setServiceErrorMessage(response.errorMessage)
+      setServiceErrorResponse(response.errorResponseBody)
+      //setServiceException(response.exception)
+    }
+  }
+
   const fetchData = () => {
     setRequestInProgress(true)
-    var request = {
-              method: props.method.toLowerCase(),
-              headers : {
-                "Authorization": "Basic " + window.getDemoCredential(),
-                "Accept": "application/json"
-              },
-    }
-    if (props.requestBody != null && props.method.toLowerCase() != "get") {
-      request['Content-type'] = "application/json"
-      request['body'] = JSON.stringify(props.requestBody)
-    } 
-    fetch(props.url, request).then(
-        (response) => {
-          return Promise.all([response.status, response.text()]);
-        }
-    ).then(
-        (response) => {
-          try {
-            setRequestInProgress(false)
-            setServiceResponseCode(response[0])
-						if (199 < response[0]  && response[0] < 299) {
-							try {
-                const json = JSON.parse(response[1])
-								responseCallback(json)
-                setServiceResponse(json)
-                setServiceErrorResponse(null)
-                setServiceErrorMessage(null)
-							} catch (exception) {
-                setServiceResponse(null)
-								setServiceErrorMessage("(HTTP " + response[0] + "): Expected a JSON response, received: " + window.truncateText(response[1], 12))
-								setServiceErrorResponse(response[1])
-								// Optionally also preserve the exception
-								//setServiceException(exception)
-							}
-						} else {
-              setServiceErrorMessage("HTTP " + response[0])
-              if ( response[1] == null || response[1] == "") setServiceErrorResponse("(no content)")
-              else setServiceErrorResponse(response[1])
-            }
-          } catch (exception) {
-            setServiceErrorMessage(exception['message'])
-            setServiceException(exception)
-          }
-        },
-        (error) => {
-          setServiceErrorMessage("This could be due to a transport layer error such as a CORS error, or a service timeout")
-          setServiceException(error)
-          setRequestInProgress(false)
-        }
+    window.fetchRestApi(
+      props.url, 
+      props.method.toLowerCase(), 
+      {         
+        "Authorization": "Basic " + window.getDemoCredential(),
+        "Accept": "application/json"
+      }, 
+      props.requestBody,  
+      fetchDataCallback
     )
   }
 

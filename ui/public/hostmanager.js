@@ -11,6 +11,68 @@ function getFileManagerIconColor() {
 }
 
 //
+// Fetch call to a REST API with validation of the expected JSON response,
+// and error handling for non 2xx responses
+//
+//     serviceHttpRequest = An object containing {headers}, {method}, and request {body}
+//     serviceResponseCallback = A method to invoke when the response is received
+//
+function fetchRestApi(url, method, headers, body,  serviceResponseCallback) {
+    var request = {
+      method: method,
+      headers: headers == null ? {} : {...headers}
+    }
+    if (body != null && method.toLowerCase() != "get") {
+      request.headers['Content-type'] = "application/json"
+      request.body = JSON.stringify(body)
+    }
+    var serviceResponse = {
+      statusCode: 0,            // The HTTP response code
+      responseBody: null,       // The HTTP response body on 2xx (JSON Only)
+      errorMessage: null,       // A descriptive error message on the result
+      errorResponseBody: null,  // The HTTP response body on non-2xx (Can be text or JSON)
+      exception: null           // An exception thrown by the fetch() call itself
+    }
+    fetch(url, request).then(
+        (response) => {
+          serviceResponse.statusCode = response.status
+          return response.text()
+        }
+    ).then(
+        (response) => {
+          try {
+						if (199 < serviceResponse.statusCode && serviceResponse.statusCode < 299) {
+							try {
+								 const json = JSON.parse(response)
+								 serviceResponse.responseBody = json
+							} catch (exception) {
+									serviceResponse.errorMessage = "(HTTP " + serviceResponse.statusCode + "): Expected a JSON response, received: " + window.truncateText(response, 50)
+									serviceResponse.errorResponseBody = response
+									// Optionally also preserve the exception
+									exception = exception
+							}
+						} else {
+								serviceResponse.errorMessage = "HTTP " + serviceResponse.statusCode
+								if ( response == null || response == "") serviceResponse.errorResponseBody = "(no content)"
+								else serviceResponse.errorResponseBody = response
+						}
+            serviceResponseCallback(serviceResponse)
+          } catch (exception) {
+            serviceResponse.errorMessage = exception['message']
+            serviceResponse.exception = exception
+            serviceResponseCallback(serviceResponse)
+          }
+        },
+        (error) => {
+          serviceResponse.errorMessage = "This could be due to a transport layer error such as a CORS error, or a service timeout"
+          serviceResponse.exception = error
+          serviceResponseCallback(serviceResponse)
+        }
+    )
+}
+
+
+//
 // Credential is set on the API server's container as 
 //
 //    ADMIN_USERNAME=admin

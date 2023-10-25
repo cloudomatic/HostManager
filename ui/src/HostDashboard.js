@@ -75,7 +75,7 @@ export default function HostDashboard() {
 
   return (
     <div>
-      <FetchComponent responseCallback={handleFetchData} url={"/api/v1/status_"} method="GET" hideErrorBox={apiAvailable} />
+      {/*<FetchComponent responseCallback={handleFetchData} url={"/api/v1/status_"} method="GET" hideErrorBox={apiAvailable} />*/}
       {/*
               <div id="Title" style={{paddingBottom: "5.0em"}}>
                 <span id="label" style={{ paddingRight: "0.2em"}}>
