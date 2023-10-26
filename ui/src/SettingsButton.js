@@ -50,7 +50,7 @@ export default function SettingsButton() {
 
   const handleThemeSwitch = (theme) => {
     window.setTheme(theme)
-    window.location.href="/"
+    window.reloadApp()
   }
 
   return (

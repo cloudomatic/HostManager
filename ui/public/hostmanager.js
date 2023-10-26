@@ -10,6 +10,10 @@ function getFileManagerIconColor() {
   return "rgb(114, 148, 194)"
 }
 
+function reloadApp() {
+  window.location.href="index.html"
+}
+
 //
 // Fetch call to a REST API with validation of the expected JSON response,
 // and error handling for non 2xx responses

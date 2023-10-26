@@ -10,6 +10,10 @@ function getFileManagerIconColor() {
   return "rgb(114, 148, 194)"
 }
 
+function reloadApp() {
+  window.location.href="index.html"
+}
+
 //
 // Fetch call to a REST API with validation of the expected JSON response,
 // and error handling for non 2xx responses
@@ -181,7 +185,7 @@ function getDrawerIconColor() {
 // A demo filesystem we can use when the API isn't returning any data from the host.  This will enable the UI to run in a demonstration mode.
 //
 function getDemoHostFileSystem() {
- return {
+  return {
     "/" : {
       "/var" : { },
       "/home" : {
@@ -193,19 +197,19 @@ function getDemoHostFileSystem() {
             },
             "2021-09-01.png": {
               "type": "image",
-              "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/develop/demo/2021-09-01.png",
+              "thumbnail": "2021-09-01.png",
               "size": "8k"
             }
           },
           "/SecurityCamera002": {
             "2021-09-02.png": {
               "type": "image",
-              "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/develop/demo/2021-09-02.png",
+              "thumbnail": "2021-09-02.png",
               "size": "192k"
             },
             "2021-09-03.png": {
               "type": "image",
-              "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/develop/demo/2021-09-03.png",
+              "thumbnail": "2021-09-03.png",
               "size": "163k"
             }
           },
@@ -214,31 +218,31 @@ function getDemoHostFileSystem() {
           "/Lex" : {
             "Carmack.001.png": {
               "type": "image",
-              "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/develop/demo/Carmack.001.png",
+              "thumbnail": "Carmack.001.png",
               "size": "958k"
             },
             "Carmack.002.png": {
               "type": "image",
-              "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/develop/demo/Carmack.002.png",
+              "thumbnail": "Carmack.002.png",
               "size": "958k"
             },
             "Carmack.003.png": {
               "type": "image",
-              "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/develop/demo/Carmack.003.png",
+              "thumbnail": "Carmack.003.png",
               "size": "958k"
             },
             "Carmack.004.png": {
               "type": "image",
-              "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/develop/demo/Carmack.004.png",
+              "thumbnail": "Carmack.004.png",
               "size": "958k"
             },
             "Lex.001.png": {
               "type": "image",
-              "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/develop/demo/Lex.001.png"
+              "thumbnail": "Lex.001.png"
             },
             "Lex.002.png": {
               "type": "image",
-              "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/develop/demo/Lex.002.png",
+              "thumbnail": "Lex.002.png",
               "size": "958k"
             },
             "transcript.txt": {
@@ -260,7 +264,7 @@ function getDemoHostFileSystem() {
             "type": "text",
             "size": "30k",
             "text": "#!/bin/sh\n\necho \"Hello \"World"
-          },
+          }, 
           "readme.txt" : {
             "type": "text",
             "text": "On the other hand, we denounce with righteous indignation and dislike men who are so beguiled and demoralized by the charms of pleasure of the moment, so blinded by desire, that they cannot foresee the pain and trouble that are bound to ensue; and equal blame belongs to those who fail in their duty through weakness of will, which is the same as saying through shrinking from toil and pain. These cases are perfectly simple and easy to distinguish. In a free hour, when our power of choice is untrammelled and when nothing prevents our being able to do what we like best, every pleasure is to be welcomed and every pain avoided. But in certain circumstances and owing to the claims of duty or the obligations of business it will frequently occur that pleasures have to be repudiated and annoyances accepted. The wise man therefore always holds in these matters to this principle of selection: he rejects pleasures to secure other greater pleasures, or else he endures pains to avoid worse pains.",
@@ -268,14 +272,13 @@ function getDemoHostFileSystem() {
           },
           "icon.png" : {
             "type": "image",
-            "thumbnail": "https://raw.githubusercontent.com/cloudomatic/HostManager/develop/demo/globe.png",
+            "thumbnail": "globe.png",
             "size": "958k"
           }
         }
       }
     }
   }
-
 }
 
 
