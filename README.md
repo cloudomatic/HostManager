@@ -1,7 +1,7 @@
 
   A React/Java single-page-app demonstration project, consisting of a browser-based remote access single-host server manager, allowing shell and file view/edit access to the host where the server API executes.
 
-  See the UI <a href="https://raw.githack.com/cloudomatic/HostManager/ui_demo/demo/index.html" target="_uidemo">demo</a> and the <a href="https://raw.githack.com/cloudomatic/HostManager/main/etc/spec.html" target="_spec">OpenAPI spec</a>.
+  See the UI <a href="https://raw.githack.com/cloudomatic/HostManager/develop/demo/index.html" target="_uidemo">demo</a> and the <a href="https://raw.githack.com/cloudomatic/HostManager/main/etc/spec.html" target="_spec">OpenAPI spec</a>.
 
   # System Requirements
 
