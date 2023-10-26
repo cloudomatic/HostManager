@@ -57,8 +57,6 @@ export default function HostManager() {
   // The navigation controller function.  Sets the main component area to the selected component
   //
   const navigationController = (componentName) => {
-    //debugger;
-    //console.log("navigationController(" + componentName + ")")
     setCurrentlySelectedPage(componentName)
   }
 

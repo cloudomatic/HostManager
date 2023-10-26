@@ -2,7 +2,7 @@ import * as React from 'react';
 import Icon from './Icon';
 import Text from './Text';
 
-export default function FilePreview({ filename = "unknown", fileType = "unknown", previewText = "", fileSize = "?KB", thumbnail="" }) {
+export default function FilePreview({ filepath = "unknown", fileType = "unknown", previewText = "", fileSize = "?KB", thumbnail="" }) {
 
   //const iconColor="rgb(57, 113, 189)"
   //const iconColor="rgb(69, 116, 181)"
@@ -11,13 +11,7 @@ export default function FilePreview({ filename = "unknown", fileType = "unknown"
   const iconColor=window.getTheme().primaryColor
   const shade01Color=window.getTheme().shadedBoxColor
   const shade02Color=window.getTheme().primaryColor
-
-
-  var fileDisplayName = "Unknown"
-  if (filename !== "undefined") {
-    if (filename.startsWith("/")) fileDisplayName = filename.substring(1, filename.length)
-    else fileDisplayName = filename
-  }
+  const fileDisplayName = window.getFilenameFromPath(filepath).replace("/", "")
 
   const downloadFile = (filename, type, text) => {
     var json = { hello: "world" }
@@ -46,7 +40,7 @@ export default function FilePreview({ filename = "unknown", fileType = "unknown"
 													 transform="scale(2.4)"
 													 color={iconColor}
 												 />
-												 <div id="div-text-preview" style={{padding: "1.0em 0em 0em 0em", overflow: "hidden", backgroundColor: "none", height: "100%"}}>
+												 <div id="div-text-preview" style={{padding: "1.0em 0em 0em 0em", overflow: "hidden", backgroundColor: "none", height: "100%", whiteSpace: "pre-wrap", textAlign: "left"}}>
 													 <Text fontSize="0.8em" style={{}}>
 														   {window.truncateText(previewText, 500)}
 													 </Text>

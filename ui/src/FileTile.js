@@ -4,15 +4,14 @@ import Text from './Text';
 
 export default function FileTile(props) {
 
-  const iconColor=window.getTheme().fileManagerIconColor
-  //const iconColor=window.getFileManagerIconColor()
+  const fileDisplayName = props.filename !== "undefined" ? 
+                          (
+                            props.filename.startsWith("/") ? props.filename.substring(1, props.filename.length) : props.filename
+                          )
+                          : 
+                          "unknown"
 
-  var fileDisplayName = "Unknown"
-  if (props.filename !== "undefined") {
-    if (props.filename.startsWith("/")) fileDisplayName = props.filename.substring(1, props.filename.length)
-    else fileDisplayName = props.filename
-  }
-  
+  const iconColor=window.getTheme().fileManagerIconColor
 
   const renderTileImage = (fileType, thumbnail) => {
           switch (fileType) {

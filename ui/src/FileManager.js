@@ -10,10 +10,20 @@ import WarningBox from './WarningBox.js'
 
 export default function FileManager() {
 
-  const [fileSystem, setFileSystem] = React.useState(window.getDemoHostFileSystem())
-  const [currentFilesystemView, setCurrentFilesystemView] = React.useState("/home/guest")
-  const [view, setView] = React.useState("tile")
+  const [currentFolderInfo, setCurrentFolderInfo] = React.useState({"/": {}})
+  const [currentFilesystemPath, setCurrentFilesystemPath] = React.useState("/")
+  const [view, setView] = React.useState("tile")  // "tile" or "list"
   const [filePreviewData, setFilePreviewData] = React.useState(undefined)
+  const [demoMode, setDemoMode] = React.useState(false)
+
+  const fetchApiData = (path) => {
+    window.fetchRestApi("/api/v1/files" + path, "get", {"Authorization": "Basic " + window.getDemoCredential()}, null, handleUpdateFilesystemData)
+  }
+  
+  React.useEffect( () => {
+    fetchApiData(currentFilesystemPath)
+  }, [])
+
 
   //
   // Handler for the tile/list view selector
@@ -23,51 +33,90 @@ export default function FileManager() {
   }
 
   //
+  // API retrieval callback when a filesystem view change is updated
+  //
+  const handleUpdateFilesystemData = (data) => {
+    if (data.errorMessage != null && demoMode == false) {
+      setDemoMode(true) 
+      setCurrentFilesystemPath("/home/guest")
+      const fileData = getDemoCurrentSubFileSystem("/home/guest")
+      setCurrentFolderInfo(fileData)
+    } else {
+      if (data.responseBody[Object.keys(data.responseBody)[0]].hasOwnProperty("size")) {
+        // It's a file, show the preview pane
+        setFilePreviewData(data.responseBody)
+      } else {
+        setCurrentFolderInfo(data.responseBody)
+      }
+    }
+  }
+
+  //
   // Handler for a user selecting a subfolder inside the TileView or ListView components
   // 
   const handleFileViewFileClicked = (filename) => {
-    console.log(filename)
-    if (filename.startsWith("/")) setCurrentFilesystemView(currentFilesystemView + filename)
-    else {
-      const fileData = getCurrentSubFileSystem(currentFilesystemView)[filename]
-      const subFileTree = getSubFileTree(currentFilesystemView + "/" + filename)
-      var _filePreviewData = {}
-      _filePreviewData[filename] = subFileTree[filename]
-    }
-    setFilePreviewData(_filePreviewData)
+      const fullPathToClickedFile = filename.trim().startsWith("/") ? 
+                                      ((currentFilesystemPath != "/") ? 
+                                           currentFilesystemPath + filename : 
+                                           filename
+                                      )
+                                      :
+                                      ((currentFilesystemPath != "/") ?
+                                           currentFilesystemPath + "/" + filename : 
+                                           currentFilesystemPath + filename
+                                      )
+			if (filename.startsWith("/")) {
+        setCurrentFilesystemPath(fullPathToClickedFile)
+        setFilePreviewData(undefined)
+      }
+      if (!demoMode) fetchApiData(fullPathToClickedFile, "get", null, null, handleUpdateFilesystemData)
+      else {
+        if (filename.trim().startsWith("/")) {
+          // Is a folder
+					setCurrentFolderInfo(getDemoCurrentSubFileSystem(fullPathToClickedFile))
+        } else {
+          // Is a file
+          setFilePreviewData({ [fullPathToClickedFile]: getDemoSubFileTree(fullPathToClickedFile)[filename]})
+        } 
+      }
   }
 
   // 
-  // Handler for the user selecting a parent folder inside the FileNavigator.  This is an index within
-  // currentFilesystemView
+  // Handler for the user selecting a parent folder inside the FileNavigator.  Path is an index within
+  // currentFilesystemPath
   //
   const handleFileNavigatorSelection = (path) => {
-    setCurrentFilesystemView(path)
+    setCurrentFilesystemPath(path)
+    if (!demoMode) fetchApiData(path)
+    else {
+      const fileData = getDemoCurrentSubFileSystem(path)
+      setCurrentFolderInfo(getDemoCurrentSubFileSystem(path))
+    }
     setFilePreviewData(undefined)
   }
 
   //
-  // We want to be able to have a filesystem navigator component tell us what path the user wants to view.  This function
-  // will return the subtree of the file system based on what this navigator is set to.
+  // In the demo mode, we want to be able to have a filesystem navigator component tell us what path the user wants to view.  This function
+  // will return the subtree of the file system based on what the navigator is set to.
   //
-  const getCurrentSubFileSystem = (_currentFilesystemView) => {
-    const currentSubtree = _currentFilesystemView.split("/").slice(1)
-    var subtreePointer = fileSystem["/"]
+  const getDemoCurrentSubFileSystem = (_currentFilesystemPath) => {
+    const currentSubtree = _currentFilesystemPath.split("/").slice(1)
+    var subtreePointer = window.getDemoHostFileSystem()["/"]
     for (const folder in currentSubtree) {
       if (subtreePointer.hasOwnProperty("/" + currentSubtree[folder])) {
         subtreePointer = subtreePointer["/" + currentSubtree[folder]]
       }
     }
-    return subtreePointer
+    return { [_currentFilesystemPath] : subtreePointer }
   }
 
   // 
-  // Given a filesysem object (see the sample/default object structure above), return the contents 
+  // In demo mode, given a filesysem object (see the sample/default object structure in window.getDemoHostFileSystem()), return the contents 
   // of a nested folder specified by fullPathname
   //
-  const getSubFileTree = (fullPathname) => {
+  const getDemoSubFileTree = (fullPathname) => {
     const subTreeTokens = fullPathname.split("/").slice(1)
-    var subtreePointer = fileSystem["/"]
+    var subtreePointer = window.getDemoHostFileSystem()["/"]
     for (const folder in subTreeTokens) {
       if (subtreePointer.hasOwnProperty("/" + subTreeTokens[folder])) {
         subtreePointer = subtreePointer["/" + subTreeTokens[folder]]
@@ -79,14 +128,15 @@ export default function FileManager() {
   const apiCall=<>curl -ks -X GET \ <br />
                 -H User-agent: host-manager \<br />
                 -H Authorization: basic ********** \<br />
-                /api/v1/files{currentFilesystemView}{filePreviewData != null && "/" + Object.keys(filePreviewData)[0] + "?preview=true"}</>
+                /api/v1/files{currentFilesystemPath}{filePreviewData != null && "/" + Object.keys(filePreviewData)[0] + "?preview=true"}</>
 
+  window.scrollTo(0, 0);
  
   return (
     <>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginRight: "4vw"}}>
         <div style={{paddingBottom: "2.0em"}}>
-          <span><FileNavigator currentFilesystemView={currentFilesystemView} folderClickedHandler={handleFileNavigatorSelection} /></span>
+          <span><FileNavigator currentFilesystemPath={currentFilesystemPath} folderClickedHandler={handleFileNavigatorSelection} /></span>
         </div>
         <div>
           <span style={{}}><ViewSwitch selectedView={view} viewChangeHandler={handleViewChange} /></span>
@@ -105,16 +155,16 @@ export default function FileManager() {
         <div id="div-file-view" style={{paddingBottom: "2.0em", marginLeft: view == "tile" ? "0em" : "10em"  }}>
 					{
 						view == "tile" ?
-							<TileFileView files={getCurrentSubFileSystem(currentFilesystemView)} fileClickedHandler={handleFileViewFileClicked} /> :
-							<ListFileView files={getCurrentSubFileSystem(currentFilesystemView)} fileClickedHandler={handleFileViewFileClicked} />
+							<TileFileView files={currentFolderInfo} fileClickedHandler={handleFileViewFileClicked} /> :
+							<ListFileView files={currentFolderInfo} fileClickedHandler={handleFileViewFileClicked} />
 					}
         </div>
-        {   /*minHeight: "18.0em", maxHeight: "18.0em" */
+        {/*minHeight: "18.0em", maxHeight: "18.0em" */
           filePreviewData !== undefined && (
 						<div style={{ width: "30vw", height: "50vh", marginRight: view == "tile" ? "0em" : "10em" }}>
 												 <FilePreview
 														fileType={filePreviewData[Object.keys(filePreviewData)[0]].type}
-														filename={Object.keys(filePreviewData)[0]}
+														filepath={Object.keys(filePreviewData)[0]}
 														thumbnail={filePreviewData[Object.keys(filePreviewData)[0]].thumbnail}
                             previewText={filePreviewData[Object.keys(filePreviewData)[0]].text}
 												 />

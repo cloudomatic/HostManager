@@ -17,9 +17,10 @@ public class TestFileManager {
 
   @Test
   public void testGetPathInfo() throws Exception {
-    if (!FileManager.getPathInfo("/").getJSONObject(".dockerenv").getString("type").equals("unknown")) throw new Exception("Expected /.dockerenv to have type 'unknown'");
-    if (!FileManager.getPathInfo("/src/ui/public").getJSONObject("globe.png").has("thumbnail")) throw new Exception("Expected a thumbnail image for globe.png");
+    if (!FileManager.getPathInfo("/").getJSONObject("/").getJSONObject(".dockerenv").getString("type").equals("unknown")) throw new Exception("Expected /.dockerenv to have type 'unknown'");
+    if (!FileManager.getPathInfo("/src/ui/public").getJSONObject("/src/ui/public").getJSONObject("globe.png").has("thumbnail")) throw new Exception("Expected a thumbnail image for globe.png");
     //System.out.println(FileManager.getPathInfo("/src/ui/public/Lex.001.png"));
+    //System.out.println(FileManager.getPathInfo("/"));
   }
 
   @Test

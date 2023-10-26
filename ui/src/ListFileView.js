@@ -5,6 +5,8 @@ import Text from './Text.js';
 
 export default function ListFileView(props) {
 
+  const folderInfo = props.files !== undefined ? props.files[Object.keys(props.files)[0]] : null
+
   const handleFileSelect = (filename, fileType) => {
     //if (fileType == "folder") 
     props.fileClickedHandler(filename)
@@ -13,7 +15,7 @@ export default function ListFileView(props) {
   return (
     <div id="div-tile-file-view" style={{   paddingTop: "0.0em"}}>
       {
-        props.files !== undefined && Object.keys(props.files).length == 0 && 
+        folderInfo !== undefined && Object.keys(folderInfo).length == 0 && 
           <span style={{paddingLeft: "2.1em"}}>
             <Text>
               <i>No files found...</i>
@@ -21,14 +23,14 @@ export default function ListFileView(props) {
           </span>
       }
       { 
-        props.files !== undefined && Object.keys(props.files).map((key, index) => {
-          const fileType = key.startsWith("/") ? "folder" : props.files[key].type
+        folderInfo !== undefined && Object.keys(folderInfo).map((key, index) => {
+          const fileType = key.startsWith("/") ? "folder" : folderInfo[key].type
           return (
               <div key={"file" + key} id={fileType + "-" + key} onClick={(event) => handleFileSelect(key, fileType)} style={{margin: "0px"}}>
                 <FileListItem
                   fileType={fileType}
                   filename={key}
-                  fileSize={props.files[key].size}
+                  fileSize={folderInfo[key].size}
                   fileClickedHandler={handleFileSelect}
                 />
               </div>

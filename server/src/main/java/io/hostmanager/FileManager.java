@@ -20,7 +20,7 @@ public class FileManager {
   public static final String imageFileExtensions = "png gif jpg jpeg bmp";
   
   // These are files we'll return a brief amount of preview text on in the "text" JSON attribute
-  public static final String textFileExtensions = "sh txt conf";
+  public static final String textFileExtensions = "sh txt conf js css html";
     
   private static BufferedImage resizeImage(BufferedImage originalImage, int newWidth, int newHeight) {
     /*
@@ -95,8 +95,8 @@ public class FileManager {
   // For files, we return a larger preview image suitable for displaying in a CSS 30vw box
   //
   public static JSONObject getPathInfo(String filePath) throws Exception {
-    if ((new java.io.File(filePath)).isDirectory()) return getDirectoryContents(filePath);
-    else return getFileInfo(filePath, false);
+    if ((new java.io.File(filePath)).isDirectory()) return (new JSONObject()).put(filePath, getDirectoryContents(filePath));
+    else return (new JSONObject()).put(filePath, getFileInfo(filePath, false));
   }
 
 
@@ -104,7 +104,6 @@ public class FileManager {
   // When thumbnailOnly == false we show a larger preview image
   // 
   public static JSONObject getFileInfo(String filePath, boolean thumbnailOnly) throws Exception {
-            //System.out.println("FileManager.getFileInfo(): > :" + filePath);
             java.io.File fileEntry = new File(filePath);
             JSONObject fileInfo = new JSONObject();
             final String filename = fileEntry.getName();
@@ -120,10 +119,8 @@ public class FileManager {
   }
 
   public static JSONObject getDirectoryContents(String filePath) throws Exception {
-    //System.out.println("FileManager.getDirectoryContents(): >: " + filePath);
     JSONObject directoryContents = new JSONObject();
     for (final File fileEntry : new File(filePath).listFiles()) {
-        //System.out.println("FileManager.getDirectoryContents(): Processing file " + fileEntry.getName() + " in " + filePath);
         if (fileEntry.isDirectory()) {
             directoryContents.put("/" + fileEntry.getName(), new JSONObject());
         } else {

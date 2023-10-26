@@ -691,6 +691,14 @@ function getNodeData() {
 }
 
 //
+// Get the filename from a file path
+//
+function getFilenameFromPath(fullFilePathname) {
+  return fullFilePathname.split("/")[fullFilePathname.split("/").length - 1]
+}
+
+
+//
 // Get the value of a query string parameter
 //
 function getParameter(queryString, parameter) {

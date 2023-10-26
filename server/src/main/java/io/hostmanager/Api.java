@@ -7,7 +7,7 @@ import io.hostmanager.ApiResponse;
 
 //
 // The Api class acts as the translator between the JSON/HTTP realm and the "pure Java" realm.  It functions as the controller in the Java realm, 
-// manages all JSON -> Java mapping, and sets the HTTP response code, but is independent of the HTTP layer implementation, which is provided
+// manages any needed JSON -> Java mapping, and sets the HTTP response code, but is independent of the HTTP layer implementation, which is provided
 // by the ServerController class.  If all HTTP/REST implementations were JAX-RS compliant, two controllers would not be required.  This layer can
 // also be inserted into a non-HTTP/REST framework such as a Kafka/MQ/event-driven solution
 //
@@ -37,7 +37,6 @@ public class Api {
   // Retrieve filesystem information
   //
   public static ApiResponse files(String path) throws Exception {
-    System.out.println("Api.files(): >: " + path);
     return new ApiResponse(
         200,
         FileManager.getPathInfo(path)
