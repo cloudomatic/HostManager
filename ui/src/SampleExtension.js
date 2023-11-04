@@ -1,5 +1,8 @@
 import * as React from 'react';
 import Text from "./Text.js";
+import ExpandingTileSet from "./ExpandingTileSet.js";
+import SpinningNumbers from "./SpinningNumbers.js";
+import SiteFooter from './SiteFooter.js';
 
 export default function FileManager() {
 

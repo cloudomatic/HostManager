@@ -14,7 +14,7 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: hostmanager--${release_label}
+  name: hostmanager-${release_label}
   labels:
     app: hostmanager-${release_label}
 spec:
@@ -32,3 +32,29 @@ spec:
         image: ${image_name}
         ports:
         - containerPort: 80
+        livenessProbe:
+          failureThreshold: 3
+          httpGet:
+            httpHeaders:
+            - name: User-agent
+              value: k8s-livenessProbe
+            path: /api/v1/status
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 3
+          periodSeconds: 3
+          successThreshold: 1
+          timeoutSeconds: 1
+        readinessProbe:
+          failureThreshold: 3
+          httpGet:
+            httpHeaders:
+            - name: User-agent
+              value: k8s-readinessProbe
+            path: /api/v1/status
+            port: 80
+            scheme: HTTP
+          initialDelaySeconds: 3
+          periodSeconds: 3
+          successThreshold: 1
+          timeoutSeconds: 1

@@ -2,19 +2,23 @@
 
 project_name="host-manager"
 image_name=${project_name}:0.9
-
+# This can be "java" or "python"
+server_implementation="python"
 
 #
 # Give the user some suggestions for running inside a dev container
 #
 cheat_sheet() {
  echo -e ""
- echo -e "Run a unit tests:"
+ echo -e "Run a unit test:"
  echo -e "   cd /src/server; mvn -o test -Dtest=TestApi#testShellCommand\n"
- echo -e "To rebuild/re-run the Java server, execute:\n"
+ echo -e "To rebuild/re-run the Java API server, execute:\n"
  echo -e "   kill -9 \`ps -ef | grep java | grep -v grep | awk '{print $1}' | xargs\`"
  echo -e "   mvn package"
- echo -e "   cd /src/server cd /src/server && java -jar /src/server/target/server-1.0.jar\n"
+ echo -e "   cd /src/server && java -jar /src/server/target/server-1.0.jar\n"
+ echo -e "To rebuild/re-run the Python API server, execute:\n"
+ echo -e "   kill -9 \`ps -ef | grep python | grep -v grep | awk '{print $1}' | xargs\`"
+ echo -e "   cd /src/server && ./src/main/python/server.py\n"
  echo -e "Check the status of the API service:\n"
  echo -e "   curl -vks http://localhost/api/v1/status\n"
  echo -e "Restart the React dev server:\n"
@@ -55,9 +59,9 @@ test_api() {
       --network host \
       -v $(pwd):/src \
       -e TRACE=$TRACE \
-      -e API_ENDPOINT="$api_endpoint" \
+      -e API_ENDPOINT="{$api_endpoint}" \
       alpine:latest \
-      sh -c 'apk update && apk add python3 bash py3-pip jq curl && pip install requests urllib3 && python3 /src/server/src/test/python/IntegrationTests.py $API_ENDPOINT'
+      sh -c 'apk update && apk add python3 bash py3-pip jq curl && pip install flask requests urllib3 && python3 /src/server/src/test/python/IntegrationTests.py $API_ENDPOINT'
   fi
 }
 
@@ -74,6 +78,7 @@ test_image() {
     --network testing-the-${project_name}-image  \
     -v $(pwd):/src \
     -p $port:80 \
+    -e SERVER_IMPLEMENTATION=${server_implementation} \
     -e ADMIN_USERNAME=admin \
     -e ADMIN_PASSWORD=admin \
     -e OFFLINE_MODE=false \
@@ -126,12 +131,21 @@ build_artifacts() {
 # Recompile and re-run the API server
 #
 restart_server() {
-  echo "Shutting down server..."
-  kill -9 `ps -ef | grep java | grep jar | grep -v grep | awk '{print $1}'`
-  cd /src/server
-  mvn package -DskipTests
-  echo "Starting API server..."
-  cd /src/server && java -jar /src/server/target/server-1.0.jar
+  echo ""
+  #if [ "$server_implementation" == "python" ]; then
+  #  echo "Shutting down server..."
+  #  kill -9 `ps -ef | grep python | grep jar | grep -v grep | awk '{print $1}'`
+  #  cd /src/server
+  #  echo "Starting API server..."
+  #  cd /src/server && ./server/src/main/python/server.py
+  #elif [ "$server_implementation" == "java" ]; then
+#		echo "Shutting down server..."
+#		kill -9 `ps -ef | grep java | grep jar | grep -v grep | awk '{print $1}'`
+#		cd /src/server
+#		mvn package -DskipTests
+	#	echo "Starting API server..."
+	#	cd /src/server && java -jar /src/server/target/server-1.0.jar
+  #fi
 }
 
 #
@@ -158,33 +172,42 @@ test_development_container() {
 }
 
 #
-# Run a development container with the source worktree mounted
-#
-run_development_container() {
-    docker run -it --rm --name ${project_name}-dev-container \
-    -v $(pwd):/src \
-    -p 3000:3000 \
-    -p 443:443 \
-    -p 80:80 \
-    -e ADMIN_USERNAME=admin \
-    -e ADMIN_PASSWORD=admin \
-    -e OFFLINE_MODE=false \
-    alpine:latest sh -c 'apk update && apk add bash && cd /src && ./build setup_development_container && cd /src && ./build start_development_container_services && echo "Connect to http://localhost:3000 to run the desktop, or run \"./build test_dev_container\" to validate the API and UI servers" && sh'
-}
-
-#
 # Start the API (Java) server and the React dev server
 #
 start_development_container_services() {
   echo "Starting UI dev server..."
   cd /src/ui && nohup yarn start &
   echo "Starting API server..."
-  cd /src/server && nohup java -jar /src/server/target/server-1.0.jar &
+  if [ "$server_implementation" == "java" ]; then
+    cd /src/server && nohup java -jar /src/server/target/server-1.0.jar &
+  elif [ "$server_implementation" == "python" ]; then
+    cd /src/server && nohup ./server/src/main/python/server.py &
+  fi
+  echo "The UI server log is available in ./ui/nohup.out"
+  echo "The API server log is availalbe in ./server/nohup.out"
   echo "Waiting for servers to start (10 seconds)...."
   sleep 10
   test_development_container
   echo -e "Run\n     ./build cheat_sheet \n\nfor a list of build/deploy options\n"
+  echo ""
 }
+
+#
+# Run a development container with the source worktree mounted
+#
+run_development_container() {
+			docker run -it --rm --name ${project_name}-dev-container \
+			-v $(pwd):/src \
+			-p 3000:3000 \
+			-p 443:443 \
+			-p 80:80 \
+			-e ADMIN_USERNAME=admin \
+			-e ADMIN_PASSWORD=admin \
+			-e OFFLINE_MODE=false \
+			-e SERVER_IMPLEMENTATION=${server_implementation} \
+			alpine:latest sh -c 'apk update && apk add bash && cd /src && ./build setup_development_container && cd /src && ./build start_development_container_services && echo "Connect to http://localhost:3000 to run the desktop, or run \"./build test_dev_container\" to validate the API and UI servers" && sh'
+}
+
 
 #
 # Setup a dev container.  Note that this is called from etc/Dockerfile_dev
@@ -196,7 +219,7 @@ setup_development_container() {
       ln -s /node_modules /src/ui/node_modules 2>/dev/null
       apk update
       apk add bash python3 py3-pip jq curl git yarn openjdk17 maven
-      pip install requests urllib3
+      pip install flask requests urllib3
       yarn install
       cd /src/server
       mvn package
@@ -214,15 +237,19 @@ run_offline_development_container() {
     echo "Docker is not available and/or did not find an image named ${project_name}-develop:1.0.  Launch Docker and run ./build development_image to create it, or run ./build run_development_container."
     exit 1
   fi
-  docker run -it --rm --name ${project_name}-develop \
-    -v $(pwd):/src \
-    -p 3000:3000 \
-    -p 443:443 \
-    -p 80:80 \
-    -e ADMIN_USERNAME=admin \
-    -e ADMIN_PASSWORD=admin \
-    -e OFFLINE_MODE=true \
-    ${project_name}-develop:0.9 sh -c "cd /src && ./build start_development_container_services && sh"
+  if [ "$server_implementation" == "python" ]; then
+    echo "Not implemented"
+  elif [ "$server_implementation" == "java" ]; then
+		docker run -it --rm --name ${project_name}-develop \
+			-v $(pwd):/src \
+			-p 3000:3000 \
+			-p 443:443 \
+			-p 80:80 \
+			-e ADMIN_USERNAME=admin \
+			-e ADMIN_PASSWORD=admin \
+			-e OFFLINE_MODE=true \
+			${project_name}-develop:0.9 sh -c "cd /src && ./build start_development_container_services && sh"
+  fi
 }
 
 #
@@ -275,6 +302,7 @@ deploy_to_kubernetes() {
   echo -e "Deploying $image as release label: $release_label in namespace $namespace\c"
   cat ./etc/k8s.template.yaml | sed "s/\${image_name}/$image/g" | sed "s/\${release_label}/$release_label/g" > /tmp/$release_label.deploy.yaml
   cat /tmp/$release_label.deploy.yaml
+  return
   kubectl -n $namespace apply -f /tmp/$release_label.deploy.yaml
   error=$?
   if [ $error -eq 0 ]; then
@@ -309,15 +337,15 @@ undeploy_from_kubernetes() {
   fi
   kubectl -n $namespace get events --sort-by='.lastTimestamp' | tail -5
 }
-
   
 #
-# Setup Docker on Raspbian if needed
+# Setup Docker on the local host
 #
 setup_docker() {
   os=`cat /etc/os-release | grep '^NAME=' | cut -f2 -d'='`
   echo "Detected OS $os"
   if true; then
+    # this is 32-bit Raspbian
     if false; then
 			# Add Docker's official GPG key:
 			sudo apt-get update
@@ -325,7 +353,6 @@ setup_docker() {
 			sudo install -m 0755 -d /etc/apt/keyrings
 			curl -fsSL https://download.docker.com/linux/raspbian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 			sudo chmod a+r /etc/apt/keyrings/docker.gpg
-
 			# Set up Docker's Apt repository:
 			echo \
 				"deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/raspbian \
@@ -334,7 +361,7 @@ setup_docker() {
 			sudo apt-get update
 			sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
     fi
-    # Alternate method if the above fails
+    # Alternate manual method if the above fails
     if true; then
 			# https://download.docker.com/linux/raspbian/dists/bullseye/pool/stable/armhf/
       sudo apt-get update
@@ -350,6 +377,25 @@ setup_docker() {
       # https://github.com/pimoroni/hyperpixel4/issues/177
       # https://learn.pimoroni.com/article/getting-started-with-hyperpixel-4
     fi
+  else 
+    # This is 64-bit Raspbian
+    # Add Docker's official GPG key:
+		sudo apt-get update
+		sudo apt-get install ca-certificates curl gnupg
+		sudo install -m 0755 -d /etc/apt/keyrings
+		curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+		sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+		# Add the repository to Apt sources:
+		echo \
+			"deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+			"$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+			sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+		sudo apt-get update
+		sudo apt-get install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+    #curl -sSL https://get.pimoroni.com/hyperpixel4 | bash
+    # https://github.com/pimoroni/hyperpixel4/issues/177
+    # https://github.com/pimoroni/hyperpixel4
   fi
   sudo docker run -it --rm --name testing_docker_setup alpine:latest sh -c "echo Docker checks out"
 }
