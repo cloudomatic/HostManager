@@ -14,7 +14,7 @@ def run_shell_command(command, cwd = "/"):
     stdout = response.stderr.decode('utf-8')
     stderr = response.stdout.decode('utf-8')
     if len(stdout) > 0 and len(stderr) > 0: raise Exception("run_shell_command(): Exception: subprocess.run() returned both stdout and stderr")
-    return (response.returncode, stdout + stderr)
+    return (response.returncode, stdout.strip() + stderr.strip())
   else:
     raise Exception("ERROR: run_shell_command(): Empty command: <" + command + "> passed as argument")
     
@@ -23,28 +23,35 @@ def run_shell_command(command, cwd = "/"):
 # Returns 
 #
 def get_os():
-  exit_code, response = run_shell_command("uname -a")
-  return response
+  exit_code, uname = run_shell_command("uname -a")
+  os = uname.split(" ")[0]
+  if "os" == "Darwin": return "macos"
+  else: return os.lower()
 
 #
 #
 #
 def get_os_stats():
-  '''
-    String ipAddress = null;
-    String memory = null;
-    String cpus = null;
-    String containers = "22";
-    String processes= null;
-    String cpuUtilization = null;
-    String freeMemory = null;
-  '''
-
-  return {
+  stats = {
     "localtime": str(datetime.datetime.now().time()),
     "hostname": get_local_node_name(),
-    "os": get_os()
+    "os": get_os(),
+    "containers": "22",
   }
+  metrics = [ 
+    ["ipAddress", "hostname -i"],
+    ["memory", "cat /proc/meminfo | grep MemTotal | awk '{print $2}'"],
+    ["cpus", "cat /proc/cpuinfo | grep processor | wc -l"],
+    ["cpuUtilization", "grep 'cpu ' /proc/stat | awk '{usage=($2+$4)*100/($2+$4+$5)} END {print usage}'"],
+    ["freeMemory", "free | grep Mem | awk '{print $6}'"],
+    ["processes", "ps -ef | wc -l"]
+  ]
+  for metric in metrics:
+    try:
+      stats[metric[0]] = run_shell_command(metric[1])[1]
+    except Exception as e:
+      stats[metric[0]] = str(e)
+  return stats
 
 #
 #

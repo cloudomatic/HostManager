@@ -28,7 +28,8 @@ export default function Cli(props) {
 
 
   const fontFamily = "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace"
-  const fontSize = "0.9em"
+  const fontSize = "0.80em"
+  const lineHeight = "1.1"
   const fontColor = window.getTheme().textColor
   const prompt = "$"
   const hostname = "localhost"
@@ -105,7 +106,8 @@ export default function Cli(props) {
             {                                                    
               method: "post",
               headers : {
-                "Authorization" : "Basic " + window.getDemoCredential()
+                "Authorization" : "Basic " + window.getDemoCredential(),
+                "Content-type" : "application/json"
               },
               body: JSON.stringify(commandBody)
             }
@@ -176,7 +178,7 @@ export default function Cli(props) {
         }
        
         <div id="buffer-div" style={{padding: "0px 0px 2px 0px"}}>
-          <font style={{fontFamily: fontFamily, color: fontColor, fontSize: fontSize}}>
+          <font style={{fontFamily: fontFamily, color: fontColor, fontSize: fontSize, lineHeight: lineHeight}}>
             {
               screenBuffer.map( (row, index) => {
                 return (
@@ -191,7 +193,7 @@ export default function Cli(props) {
         {
           localStorage.getItem("hostmanager.options.showApiCalls") == "true" && curlCommand != null && <div style={{margin: "1.0em 0 1.0em 0"}}>
               <WarningBox
-                text=<pre style={{fontSize: "1.4em", textAlign: "left"}}>
+                text=<pre style={{lineHeight: lineHeight, fontSize: "1.4em", textAlign: "left"}}>
                   {
                     curlCommand.split("\\").map( (line, index) => {
                       return (<>{line} \<br /></>)
@@ -203,7 +205,7 @@ export default function Cli(props) {
             </div>
         }
         <div id="prompt-div" style={{ display: "flex", alignItems: "left", flexDirection: "row" }} >
-            <font style={{fontFamily: fontFamily, fontSize: fontSize, color: fontColor}}>
+            <font style={{fontFamily: fontFamily, lineHeight: lineHeight, fontSize: fontSize, color: fontColor}}>
               {hostname}&nbsp;{cwd}&nbsp;{prompt}
             </font>
           <input
@@ -222,7 +224,7 @@ export default function Cli(props) {
         </div>
         <div id="command-status-line-div">
           { autoCompleteSuggestions != undefined && autoCompleteSuggestions.length > 0 && 
-             <font style={{fontFamily: fontFamily, color: fontColor, fontSize: fontSize, flexDirection: "row" }}>
+             <font style={{fontFamily: fontFamily, color: fontColor, lineHeight, lineHeight, fontSize: fontSize, flexDirection: "row" }}>
                {
                  autoCompleteSuggestions.map( (item, index) => {
                      return (
@@ -233,7 +235,7 @@ export default function Cli(props) {
              </font>
           }
           { requestInProgress && 
-             <font style={{fontFamily: fontFamily, color: fontColor, fontSize: fontSize, flexDirection: "row", color: {fontColor} }}>
+             <font style={{fontFamily: fontFamily, color: fontColor, lineHeight: lineHeight, fontSize: fontSize, flexDirection: "row", color: {fontColor} }}>
                {/*<img src="hourglass.svg" style={{ width: "0.8em"}}  />*/} (... pending ...)
              </font>
           }
