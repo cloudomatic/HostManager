@@ -9,6 +9,7 @@ import HostDashboard from './HostDashboard'
 import MobileNavigationPanel from './MobileNavigationPanel'
 import NavigationDrawer from './NavigationDrawer'
 import SampleExtension from './SampleExtension'
+import XComponent from './XComponent'
 
 /*
   Issues:
@@ -79,6 +80,7 @@ export default function HostManager() {
   else if (currentlySelectedPage == "HostDashboard") { activeComponent = <HostDashboard /> }
   else if (currentlySelectedPage == "SampleExtension") { activeComponent = <SampleExtension /> }
   else if (currentlySelectedPage == "FetchExample") { activeComponent = <FetchExample /> }
+  else if (currentlySelectedPage == "X") { activeComponent = <XComponent /> }
   else { activeComponent = <HostDashboard /> }
 
   if ((currentlySelectedPage != null) && (pageNameFromUrl != currentlySelectedPage)) {

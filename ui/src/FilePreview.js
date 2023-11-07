@@ -42,7 +42,7 @@ export default function FilePreview({ filepath = "unknown", fileType = "unknown"
 												 />
 												 <div id="div-text-preview" style={{padding: "1.0em 0em 0em 0em", overflow: "hidden", backgroundColor: "none", height: "100%", whiteSpace: "pre-wrap", textAlign: "left"}}>
 													 <Text fontSize="0.8em" style={{}}>
-														   {window.truncateText(previewText, 500)}
+														   {window.truncateText(previewText, 300)}
 													 </Text>
 												 </div>
                        </div>
@@ -61,7 +61,7 @@ export default function FilePreview({ filepath = "unknown", fileType = "unknown"
   }
 
   return (
-    <div id="div-file-preview-outer" style={{width: "100%", minHeight: "30vh", maxHeight: "30vh", minWidth: "30vw", textAlign: "center", backgroundColor: "lightGreen", margin: "auto"}}>
+    <div id="div-file-preview-outer" style={{width: "100%", minHeight: "30vh", maxHeight: "30vh", textAlign: "center", backgroundColor: "lightGreen", margin: "auto"}}>
       <div id="div-file-preview-inner" style={{}}>
         <div id="div-file-thumbnail" style={{backgroundColor: shade01Color, padding: "1.2em", overflow: "hidden", minHeight: "40vh"}}>
         {

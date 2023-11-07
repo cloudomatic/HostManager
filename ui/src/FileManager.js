@@ -12,7 +12,7 @@ export default function FileManager() {
 
   const [currentFolderInfo, setCurrentFolderInfo] = React.useState({"/": {}})
   const [currentFilesystemPath, setCurrentFilesystemPath] = React.useState("/")
-  const [view, setView] = React.useState("tile")  // "tile" or "list"
+  const [view, setView] = React.useState("list")  // "tile" or "list"
   const [filePreviewData, setFilePreviewData] = React.useState(undefined)
   const [demoMode, setDemoMode] = React.useState(false)
 
@@ -131,7 +131,13 @@ export default function FileManager() {
                 /api/v1/files{currentFilesystemPath}{filePreviewData != null && "/" + Object.keys(filePreviewData)[0] + "?preview=true"}</>
 
   window.scrollTo(0, 0);
- 
+
+  // We can make the right side a modal dialog when mobile==true
+  const leftPanelMinWidth = "20em"
+  const rightPanelMinWidth = "20em"
+  const leftPanelPercentOfScreen = filePreviewData !== undefined ? "55%" : "95%"
+  const rightPanelPercentOfScreen = "30%"
+  
   return (
     <>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginRight: "4vw"}}>
@@ -151,26 +157,30 @@ export default function FileManager() {
             />
           </div>
       }
-      <div id="div-file-and-preview" style={{ marginRight: "3.0em", display: "flex", justifyContent: "space-between", height: "50vh"}}>
-        <div id="div-file-view" style={{paddingBottom: "2.0em", marginLeft: view == "tile" ? "0em" : "10em"  }}>
-					{
-						view == "tile" ?
-							<TileFileView files={currentFolderInfo} fileClickedHandler={handleFileViewFileClicked} /> :
-							<ListFileView files={currentFolderInfo} fileClickedHandler={handleFileViewFileClicked} />
-					}
-        </div>
-        {/*minHeight: "18.0em", maxHeight: "18.0em" */
-          filePreviewData !== undefined && (
-						<div style={{ width: "30vw", height: "50vh", marginRight: view == "tile" ? "0em" : "10em" }}>
-												 <FilePreview
-														fileType={filePreviewData[Object.keys(filePreviewData)[0]].type}
-														filepath={Object.keys(filePreviewData)[0]}
-														thumbnail={filePreviewData[Object.keys(filePreviewData)[0]].thumbnail}
-                            previewText={filePreviewData[Object.keys(filePreviewData)[0]].text}
-												 />
-						</div>
-          )
-        }
+
+
+      <div style={{display: "flex", flexWrap: "wrap", height: "10.0em", paddingTop: "2.0em", backgroundColor: "none", justifyContent: "center"}}>
+          <div id="left-panel" style={{minWidth: leftPanelMinWidth, width: leftPanelPercentOfScreen,  backgroundColor: "none"}} >
+            {
+              view == "tile" ?
+              <TileFileView files={currentFolderInfo} fileClickedHandler={handleFileViewFileClicked} /> :
+              <ListFileView files={currentFolderInfo} fileClickedHandler={handleFileViewFileClicked} />
+            }
+          </div>
+          {
+            filePreviewData !== undefined && <>
+              <div id="spacer" style={{width: "4vw", backgroundColor: "none" }} />
+              <div id="right-panel" style={{minWidth: rightPanelMinWidth, width: rightPanelPercentOfScreen, backgroundColor: "none"}} >
+                               <FilePreview
+                                  fileType={filePreviewData[Object.keys(filePreviewData)[0]].type}
+                                  filepath={Object.keys(filePreviewData)[0]}
+                                  thumbnail={filePreviewData[Object.keys(filePreviewData)[0]].thumbnail}
+                                  previewText={filePreviewData[Object.keys(filePreviewData)[0]].text}
+                               />
+
+              </div>
+            </>
+          }
       </div>
     </>
   )

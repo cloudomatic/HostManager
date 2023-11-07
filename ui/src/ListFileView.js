@@ -2,6 +2,7 @@ import * as React from 'react';
 import FileListItem from './FileListItem.js';
 import Icon from './Icon.js';
 import Text from './Text.js';
+import NewTable from './NewTable.js'
 
 export default function ListFileView(props) {
 
@@ -9,36 +10,51 @@ export default function ListFileView(props) {
 
   const handleFileSelect = (filename, fileType) => {
     //if (fileType == "folder") 
+    debugger
     props.fileClickedHandler(filename)
   }
 
+  const columns = ["name", "size", "permissions", "user", "group", "lastModified"]
+  //
+  // Takes only the values of the items in [jsonData] (an array) and creates a 2D array of rows
+  // of these values in the order specified in [columns]
+  //
+  function convertJsonDataToTableArray(jsonData, columns) {
+    var _data = []
+    jsonData.map((object, index) => {
+      var row = [object['name']]
+      columns.map((column) => {
+        row.push(object[column])
+      })
+      _data.push(row)
+    })
+    return _data
+  }
+
+  const rows = convertJsonDataToTableArray(window.convertJsonChildrenToArrayOfJsonObjects(folderInfo), columns)
+
   return (
-    <div id="div-tile-file-view" style={{   paddingTop: "0.0em"}}>
+    <div id="div-list-file-view" style={{justifyContent: "center", width: "100%"}}>
       {
-        folderInfo !== undefined && Object.keys(folderInfo).length == 0 && 
+        folderInfo !== undefined && Object.keys(folderInfo).length == 0 &&
           <span style={{paddingLeft: "2.1em"}}>
             <Text>
               <i>No files found...</i>
             </Text>
           </span>
       }
-      { 
-        folderInfo !== undefined && Object.keys(folderInfo).map((key, index) => {
-          const fileType = key.startsWith("/") ? "folder" : folderInfo[key].type
-          return (
-              <div key={"file" + key} id={fileType + "-" + key} onClick={(event) => handleFileSelect(key, fileType)} style={{margin: "0px"}}>
-                <FileListItem
-                  fileType={fileType}
-                  filename={key}
-                  fileSize={folderInfo[key].size}
-                  fileClickedHandler={handleFileSelect}
-                />
-              </div>
-           )
-        })
+      {
+        folderInfo !== undefined && Object.keys(folderInfo).length > 0 && <div style={{}}>
+          <NewTable
+            data={rows}
+            columnLabels={columns}
+            itemSelectCallback={handleFileSelect}
+          />
+        </div>
       }
     </div>
-  );
+  )
+
 
 
 }

@@ -1,6 +1,9 @@
 **/*.swp
 **/__pycache__/
 **/*.1
+**/*.2
+**/*.3
+**/ignore
 .DS_Store
 server/.DS_Store
 server/target/

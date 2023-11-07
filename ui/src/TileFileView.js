@@ -12,26 +12,8 @@ export default function TileFileView(props) {
     props.fileClickedHandler(filename)
   }
 
-  if (false) return (
-    <div style={{ display: "flex", justifyContent: "left", alignItems: "left", textAlign: "left"}}>
-      {
-        folderInfo != null && Object.keys(folderInfo).map((key, index) => {
-          const fileType = key.startsWith("/") ? "folder" : "other"
-          return (
-              <span key={"file" + key} id={fileType + "-" + key} onClick={(event) => handleFileSelect(key, fileType)}>
-                <FileTile
-								  fileType={fileType}
-								  filename={key}
-							  />
-              </span>
-           )
-        })
-      }
-    </div>
-  );
-
   return (
-    <div id="div-tile-file-view" style={{   display: "flex", flexWrap: "wrap", paddingTop: "0.0em"}}>
+    <div id="div-tile-file-view" style={{   display: "flex", flexWrap: "wrap", paddingTop: "0.0em", width: "100%"}}>
       {
         folderInfo != null && Object.keys(folderInfo).length == 0 && 
           <span style={{paddingLeft: "2.1em"}}>
@@ -44,7 +26,7 @@ export default function TileFileView(props) {
         folderInfo != null && Object.keys(folderInfo).map((key, index) => {
           const fileType = key.startsWith("/") ? "folder" : folderInfo[key].type
           return (
-              <div key={"file" + key} id={fileType + "-" + key} onClick={(event) => handleFileSelect(key, fileType)} style={{marginTop: "0.0em", width: "100px", margin: "10px", textAlign: "center", lineHeight: "2.1em"}}>
+              <div key={"file" + key} id={fileType + "-" + key} onClick={(event) => handleFileSelect(key, fileType)} style={{marginTop: "0.0em", width: "100px", margin: "0px 0px 20px 0px", textAlign: "center", lineHeight: "1.8em"}}>
                 <FileTile
                   fileType={fileType}
                   filename={key}

@@ -106,6 +106,7 @@ promote_image() {
 # Create a production-ready Docker image
 #
 build_image() {
+  # https://flask.palletsprojects.com/en/3.0.x/deploying/gunicorn/
   docker build -f ./Dockerfile -t ${image_name} .
 }
 

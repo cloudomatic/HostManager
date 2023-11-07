@@ -14,6 +14,35 @@ function reloadApp() {
   window.location.href="index.html"
 }
 
+
+//
+// Takes only the values of the items in [jsonData] (an array) and creates a 2D array of rows
+// of these values in the order specified in [columns]
+//
+// { "child-key1": {}, "child-key2": {} }
+//    becomes just:
+// [ {}, {} ]
+//
+function convertJsonChildrenToArrayOfJsonObjects(object) {
+  var array = []
+  Object.keys(object).map((key, index) => {
+    // Do a deep clone of the object
+    var _object = JSON.parse(JSON.stringify(object[key]))
+    // Add the key as an element to the object named 'key'
+    _object['key'] = key
+    array.push(_object)
+  })
+  return array
+}
+
+
+function isNumeric(str) {
+  // https://stackoverflow.com/questions/175739/how-can-i-check-if-a-string-is-a-valid-number
+  if (typeof str != "string") return false // we only process strings!  
+  return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+         !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
+}
+
 //
 // Fetch call to a REST API with validation of the expected JSON response,
 // and error handling for non 2xx responses

@@ -15,7 +15,12 @@ api_context_root = "/api/v1"
 #######################################
 
 def handle_get_files(path):
-  return file_manager.get_path_info(path)
+  try:
+    return file_manager.get_path_info(path)
+  except Exception as e:
+    if 'no such file' in str(e).lower(): 
+      return { "Error": "No such file or directory" }, 404
+    else: return { "Error": str(e) }, 500
 
 def handle_post_commands(body):
   exit_code, response = shell.run_shell_command(body['command'], body['cwd'])
