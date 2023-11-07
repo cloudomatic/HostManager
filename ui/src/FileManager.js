@@ -4,7 +4,8 @@ import FilePreview from './FilePreview.js';
 import ListFileView from './ListFileView.js';
 import TileFileView from './TileFileView.js';
 import ViewSwitch from './ViewSwitch.js';
-import WarningBox from './WarningBox.js'
+import WarningBox from './WarningBox.js';
+import Text from './Text.js';
 
 // https://jsfiddle.net/yX3p9/7/
 
@@ -12,7 +13,7 @@ export default function FileManager() {
 
   const [currentFolderInfo, setCurrentFolderInfo] = React.useState({"/": {}})
   const [currentFilesystemPath, setCurrentFilesystemPath] = React.useState("/")
-  const [view, setView] = React.useState("list")  // "tile" or "list"
+  const [view, setView] = React.useState("tile")  // "tile" or "list"
   const [filePreviewData, setFilePreviewData] = React.useState(undefined)
   const [demoMode, setDemoMode] = React.useState(false)
 
@@ -158,13 +159,21 @@ export default function FileManager() {
           </div>
       }
 
-
+      {
+        currentFolderInfo !== undefined && Object.keys(currentFolderInfo[Object.keys(currentFolderInfo)[0]]).length == 0 &&
+          <span style={{paddingLeft: "2.1em"}}>
+            <Text>
+              <i>No files found...</i>
+            </Text>
+          </span>
+      }
+ 
       <div style={{display: "flex", flexWrap: "wrap", height: "10.0em", paddingTop: "2.0em", backgroundColor: "none", justifyContent: "center"}}>
           <div id="left-panel" style={{minWidth: leftPanelMinWidth, width: leftPanelPercentOfScreen,  backgroundColor: "none"}} >
             {
               view == "tile" ?
               <TileFileView files={currentFolderInfo} fileClickedHandler={handleFileViewFileClicked} /> :
-              <ListFileView files={currentFolderInfo} fileClickedHandler={handleFileViewFileClicked} />
+              <ListFileView files={currentFolderInfo} fileClickedHandler={handleFileViewFileClicked} tableSize={filePreviewData !== undefined ? "small" : "large"}/>
             }
           </div>
           {

@@ -13,6 +13,7 @@ import TableSortLabel from '@mui/material/TableSortLabel';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
+import Icon from './Icon.js';
 //import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
@@ -153,10 +154,14 @@ export default function MuiTable({rows, headCells, headerShading, itemSelectCall
   const dense = true
   const [rowsPerPage, setRowsPerPage] = React.useState(10);
 
+  // In the data within rows, there could be an icon in the first array element
+  const dataHasRowIcon = React.isValidElement(rows[0][0])
+  const indexOfIdColumnInRow = dataHasRowIcon ? 1 : 0
+  
   function getOrderByColumnIndex(columnId) {
     var index = 0
     for (var i in headCells) if (headCells[i].id == columnId) index=i
-    return parseInt(index) + 1
+    return parseInt(index) + (indexOfIdColumnInRow + 1)
   }
 
   function descendingComparator(a, b, orderBy) {
@@ -227,6 +232,7 @@ export default function MuiTable({rows, headCells, headerShading, itemSelectCall
     }
     setSelected(newSelected);
     */
+    //setSelected([selectedIndex])
     itemSelectCallback(id)
   };
 
@@ -251,7 +257,7 @@ export default function MuiTable({rows, headCells, headerShading, itemSelectCall
         page * rowsPerPage,
         page * rowsPerPage + rowsPerPage,
       ),
-    [order, orderBy, page, rowsPerPage],
+    [order, orderBy, page, rowsPerPage, rows],
   );
 
   return (
@@ -282,7 +288,7 @@ export default function MuiTable({rows, headCells, headerShading, itemSelectCall
                 return (
                   <TableRow
                     hover
-                    onClick={(event) => handleClick(event, row[0])}
+                    onClick={(event) => handleClick(event, row[indexOfIdColumnInRow])}
                     role="checkbox"
                     aria-checked={isItemSelected || false}
                     tabIndex={-1}
@@ -300,6 +306,11 @@ export default function MuiTable({rows, headCells, headerShading, itemSelectCall
                         }}
                       />
                       */}
+                      {
+                        dataHasRowIcon && <div style={{paddingTop: "3px"}}>
+                          {row[0]}
+                        </div>
+                      }
                     </TableCell>
                     <TableCell
                       component="th"
@@ -307,10 +318,10 @@ export default function MuiTable({rows, headCells, headerShading, itemSelectCall
                       scope="row"
                       padding="none"
                     >
-                      {row[1]}
+                      {row[1 + indexOfIdColumnInRow]}
                     </TableCell>
                     {
-                      row.slice(2).map((column, index) => (
+                      row.slice(dataHasRowIcon ? 3 : 2).map((column, index) => (
                         <TableCell align="right">{column}</TableCell>
                       ))
                     }

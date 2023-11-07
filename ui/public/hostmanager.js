@@ -210,6 +210,7 @@ function getDrawerIconColor() {
   return "rgb( 223, 225, 232)"
 }
 
+
 //
 // A demo filesystem we can use when the API isn't returning any data from the host.  This will enable the UI to run in a demonstration mode.
 //
@@ -222,24 +223,36 @@ function getDemoHostFileSystem() {
           "/SecurityCamera001": {
             "data.log": {
               "type": "text",
-              "size": "8k"
+              "size": "8k",
+              "user": "guest",
+              "group": "guest",
+              "lastModified": "Nov 4 15:33"
             },
             "2021-09-01.png": {
               "type": "image",
               "thumbnail": "2021-09-01.png",
-              "size": "8k"
+              "size": "8k",
+              "user": "guest",
+              "group": "guest",
+              "lastModified": "Nov 4 15:33"
             }
           },
           "/SecurityCamera002": {
             "2021-09-02.png": {
               "type": "image",
               "thumbnail": "2021-09-02.png",
-              "size": "192k"
+              "size": "192k",
+              "user": "guest",
+              "group": "guest",
+              "lastModified": "Nov 4 15:33"
             },
             "2021-09-03.png": {
               "type": "image",
               "thumbnail": "2021-09-03.png",
-              "size": "163k"
+              "size": "163k",
+              "user": "guest",
+              "group": "guest",
+              "lastModified": "Nov 4 15:33"
             }
           },
           "/EmptyFolder" : {
@@ -248,36 +261,58 @@ function getDemoHostFileSystem() {
             "Carmack.001.png": {
               "type": "image",
               "thumbnail": "Carmack.001.png",
-              "size": "958k"
+              "size": "958k",
+              "user": "guest",
+              "group": "guest",
+              "lastModified": "Nov 4 15:33"
             },
             "Carmack.002.png": {
               "type": "image",
               "thumbnail": "Carmack.002.png",
-              "size": "958k"
+              "size": "958k",
+              "user": "guest",
+              "group": "guest",
+              "lastModified": "Nov 4 15:33"
             },
             "Carmack.003.png": {
               "type": "image",
               "thumbnail": "Carmack.003.png",
-              "size": "958k"
+              "size": "958k",
+              "user": "guest",
+              "group": "guest",
+              "lastModified": "Nov 4 15:33"
             },
             "Carmack.004.png": {
               "type": "image",
               "thumbnail": "Carmack.004.png",
-              "size": "958k"
+              "size": "958k",
+              "user": "guest",
+              "group": "guest",
+              "lastModified": "Nov 4 15:33"
             },
             "Lex.001.png": {
               "type": "image",
-              "thumbnail": "Lex.001.png"
+              "thumbnail": "Lex.001.png",
+              "user": "guest",
+              "group": "guest",
+              "lastModified": "Nov 4 15:33",
+              "size": 456932
             },
             "Lex.002.png": {
               "type": "image",
               "thumbnail": "Lex.002.png",
-              "size": "958k"
+              "size": "958k",
+              "user": "guest",
+              "group": "guest",
+              "lastModified": "Nov 4 15:33"
             },
             "transcript.txt": {
               "type": "text",
               "text": "The transcript begins with a discussion on the importance of interdisciplinary collaboration in architecture. The speaker emphasizes the need for people who have expertise and creativity across multiple disciplines. They share their approach to finding interesting people to work with, which involves manifesting desires and looking at the cracks between disciplines and scales. The dean of a well-known architectural school shares their perspective on today's architects and the role of star architects. The speaker shares their preference for individuals who are dreamers addicted to reality rather than realists addicted to dreams. They look for people with industry experience, knowledge of the real world, and translational design ability.",
-              "size": "958k"
+              "size": "958k",
+              "user": "guest",
+              "group": "guest",
+              "lastModified": "Nov 4 15:33"
             }
           },
           "welcome.txt" : {
@@ -287,12 +322,18 @@ function getDemoHostFileSystem() {
           },
           "volume.dat" : {
             "type": "unknown",
-            "size": "958k"
+            "size": "958k",
+              "user": "guest",
+              "group": "guest",
+              "lastModified": "Nov 4 15:33"
           },
           "this_is_a_really_long_file_namerun.sh": {
             "type": "text",
             "size": "30k",
-            "text": "#!/bin/sh\n\necho \"Hello \"World"
+            "text": "#!/bin/sh\n\necho \"Hello \"World",
+            "user": "guest",
+            "group": "guest",
+            "lastModified": "Nov 4 15:33"
           }, 
           "readme.txt" : {
             "type": "text",

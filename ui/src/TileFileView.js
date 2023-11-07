@@ -14,14 +14,6 @@ export default function TileFileView(props) {
 
   return (
     <div id="div-tile-file-view" style={{   display: "flex", flexWrap: "wrap", paddingTop: "0.0em", width: "100%"}}>
-      {
-        folderInfo != null && Object.keys(folderInfo).length == 0 && 
-          <span style={{paddingLeft: "2.1em"}}>
-            <Text>
-              <i>No files found...</i>
-            </Text>
-          </span>
-      }
       { 
         folderInfo != null && Object.keys(folderInfo).map((key, index) => {
           const fileType = key.startsWith("/") ? "folder" : folderInfo[key].type
