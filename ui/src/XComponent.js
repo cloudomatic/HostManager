@@ -1,10 +1,16 @@
 import * as React from 'react';
 import JsonFormEditorDemo from './JsonFormEditorDemo.js';
+import ToggleSwitch from './ToggleSwitch.js';
 
 export default function XComponent() {
 
   return (
-    <JsonFormEditorDemo />
+    <>
+      <div style={{width: "20em", marginBottom: "1.0em"}}>
+        <ToggleSwitch />
+      </div>
+      <JsonFormEditorDemo />
+    </>
   )
 
   if (false) return (

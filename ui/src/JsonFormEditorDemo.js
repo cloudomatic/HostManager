@@ -243,7 +243,9 @@ export default function  JsonFormEditorDemo(props) {
               </pre>
             </div>
             &nbsp;
-            <JsonFormEditor json={jsonObject} onChangeCallback={jsonPropertyInspectorChanged} view="raw" />
+            <div style={{ width: "20em", height: "20em"}}>
+              <JsonFormEditor json={jsonObject} onChangeCallback={jsonPropertyInspectorChanged} defaultView="table" />
+            </div>
             &nbsp;
             <div id="item-1" style={{border: "1px solid black",fontSize: "0.8em", width: "20em", backgroundColor: "none"}} >
               <div style={{padding: "0.5em", backgroundColor: "lightGray"}}>JSON as modified by the form</div>
