@@ -1,6 +1,11 @@
 import * as React from 'react';
+import JsonFormEditorDemo from './JsonFormEditorDemo.js';
 
 export default function XComponent() {
+
+  return (
+    <JsonFormEditorDemo />
+  )
 
   if (false) return (
         <div style={{display: "flex", flexWrap: "wrap", height: "10.0em", backgroundColor: "red", justifyContent: "center"}}>
@@ -17,7 +22,7 @@ export default function XComponent() {
   const leftPanelPercentOfScreen = showRightPanel ? "60%" : "95%"
   const rightPanelPercentOfScreen = "30%"
   
-  return (
+  if (false) return (
         <div style={{display: "flex", flexWrap: "wrap", height: "10.0em", paddingTop: "2.0em", backgroundColor: "red", justifyContent: "center"}}>
           <div id="left-panel" style={{minWidth: leftPanelMinWidth, width: leftPanelPercentOfScreen,  backgroundColor: "green", height: "10em"}} />
           {
