@@ -3,59 +3,33 @@
 from flask import Flask, request
 import file_manager
 import shell
+import commands
+import files
+import status
 
 app = Flask(__name__)
 api_context_root = "/api/v1"
-
-#######################################
-## API Controller
-##
-## Controller functions for the API
-##  
-#######################################
-
-def handle_get_files(path):
-  try:
-    return file_manager.get_path_info(path)
-  except Exception as e:
-    if 'no such file' in str(e).lower(): 
-      return { "Error": "No such file or directory" }, 404
-    else: return { "Error": str(e) }, 500
-
-def handle_post_commands(body):
-  exit_code, response = shell.run_shell_command(body['command'], body['cwd'])
-  return { 
-    "response": response,
-    "exitCode": exit_code,
-    "command": {
-      "cwd": body['cwd'],
-      "command": body['command']
-    }
-  }
-
-def handle_get_status(subsystem):
-  return shell.get_os_stats()
 
 #######################################
 ## API Routes
 #######################################
 
 @app.route(f"{api_context_root}/status")
-def status():
-  return { "works" : "ok" }
+def route_status():
+  return status.get()
 
 @app.route(f"{api_context_root}/commands", methods=['POST'])
-def commands():
-  return handle_post_commands(request.json)
+def route_commands():
+  return commands.post(request.json)
 
 @app.route(f"{api_context_root}/files")
 @app.route(f"{api_context_root}/files/")
-def fileroot():
-  return handle_get_files("/")
+def route_fileroot():
+  return files.get("/")
 
 @app.route(f"{api_context_root}/files/<path:pathargs>")
-def files(pathargs):
-  return handle_get_files(f"/{pathargs}")
+def route_files(pathargs):
+  return files.get(f"/{pathargs}")
 
 @app.route("/")
 def static_content():
