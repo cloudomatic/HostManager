@@ -182,13 +182,14 @@ start_development_container_services() {
   if [ "$server_implementation" == "java" ]; then
     cd /src/server && nohup java -jar /src/server/target/server-1.0.jar &
   elif [ "$server_implementation" == "python" ]; then
-    cd /src/server && nohup ./server/src/main/python/server.py &
+    cd /src/server && nohup ./src/main/python/server.py &
   fi
   echo "The UI server log is available in ./ui/nohup.out"
   echo "The API server log is availalbe in ./server/nohup.out"
   echo "Waiting for servers to start (10 seconds)...."
   sleep 10
   test_development_container
+  echo -e "\nUI client is running on http://localhost:3000\n"
   echo -e "Run\n     ./build cheat_sheet \n\nfor a list of build/deploy options\n"
   echo ""
 }
@@ -219,11 +220,12 @@ setup_development_container() {
       mkdir /node_modules
       ln -s /node_modules /src/ui/node_modules 2>/dev/null
       apk update
-      apk add bash python3 py3-pip jq curl git yarn openjdk17 maven
+      apk add bash python3 py3-pip jq curl git yarn 
+      echo apk add openjdk17 maven
       pip install flask requests urllib3
       yarn install
-      cd /src/server
-      mvn package
+      echo cd /src/server
+      echo mvn package
 }
 
 #
@@ -235,13 +237,13 @@ run_offline_development_container() {
   check_image ${project_name}-develop 0.9
   image_missing=$?
   if [ $image_missing -ne 0 ]; then
-    echo "Docker is not available and/or did not find an image named ${project_name}-develop:1.0.  Launch Docker and run ./build development_image to create it, or run ./build run_development_container."
+    echo "Docker is not available and/or did not find an image named ${project_name}-develop:1.0.  Launch Docker and run './build development_image' to create it, or run './build run_development_container' to launch and setup a 'live' demonstration."
     exit 1
   fi
-  if [ "$server_implementation" == "python" ]; then
-    echo "Not implemented"
-  elif [ "$server_implementation" == "java" ]; then
-		docker run -it --rm --name ${project_name}-develop \
+  #if [ "$server_implementation" == "python" ]; then
+  #  echo "The Python backend is not yet implemented" kkk
+  #elif [ "$server_implementation" == "java" ]; then
+  docker run -it --rm --name ${project_name}-develop \
 			-v $(pwd):/src \
 			-p 3000:3000 \
 			-p 443:443 \
@@ -250,7 +252,7 @@ run_offline_development_container() {
 			-e ADMIN_PASSWORD=admin \
 			-e OFFLINE_MODE=true \
 			${project_name}-develop:0.9 sh -c "cd /src && ./build start_development_container_services && sh"
-  fi
+  #fi
 }
 
 #

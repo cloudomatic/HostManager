@@ -238,7 +238,7 @@ export default function  JsonFormEditorDemo(props) {
                   value={sourceJsonText}
                   placeholder=""
                   onChange={(event) => handleBaseJsonObjectFieldChange(event)}
-                  style={{ paddingLeft: "0.4em", fontFamily: '"Roboto", "Helvetica", "Arial", "sans-serif"', fontSize: "0.9em", border: "none"}}
+                  style={{ paddingLeft: "1.0em", fontFamily: '"Roboto", "Helvetica", "Arial", "sans-serif"', fontSize: "0.8em", border: "none"}}
                 />
               </pre>
             </div>
@@ -246,12 +246,14 @@ export default function  JsonFormEditorDemo(props) {
             <div style={{ width: "20em", height: "20em"}}>
               <JsonFormEditor json={jsonObject} onChangeCallback={jsonPropertyInspectorChanged} defaultView="table" />
             </div>
-            &nbsp;
+            &nbsp; &nbsp;
             <div id="item-1" style={{border: "1px solid black",fontSize: "0.8em", width: "20em", backgroundColor: "none"}} >
               <div style={{padding: "0.5em", backgroundColor: "lightGray"}}>JSON as modified by the form</div>
-              <pre>
-                {JSON.stringify(jsonObject, null, 2)}
-              </pre>
+              <div style={{padding: "1.0em"}}>
+                <pre>
+                  {JSON.stringify(jsonObject, null, 2)}
+                </pre>
+              </div>
             </div>
           </div>
         </div>

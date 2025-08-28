@@ -55,16 +55,17 @@ export default function Cli(props) {
         window.scrollTo(0, 0);
       } else if (promptBuffer.length > 0) {
         //screenBuffer.push(promptBuffer)
-        sendCommand(promptBuffer)
+        if (promptBuffer.startsWith("term ")) updateScreen(window.terminalCommandProcessor(promptBuffer))
+        else sendCommand(promptBuffer)
         setPromptBuffer("")
-      }
+      } 
       setAutoCompleteSuggestions([])
     } else if (entry.key == "Tab") {
       // This will cause the sendCommand() function to populate the autoCompleteSuggestions hook
       entry.preventDefault()
       // There is a bug here where this doesn't work in demo mode, if you hit up arrow then tab
       if (promptBuffer !== undefined) sendCommand("autoComplete:" + promptBuffer.split(" ")[promptBuffer.split(" ").length - 1])
-    } 
+    }
   }
 
   const handleCharacterEntry = (entry) =>  {
@@ -82,6 +83,12 @@ export default function Cli(props) {
     setCommandHistory(newCommandHistory)
   }
 
+  const handleClick = (clickEvent) => {
+    //debugger
+    // disambiguate between click and select here
+    //document.querySelector('#prompt').focus()
+  }
+
   const sendCommand = (command) => {
     setApiServiceErrorMessage(null)
     setApiServiceException(null)
@@ -97,7 +104,8 @@ export default function Cli(props) {
     } else commandBody['command'] = command
     setCurlCommand("curl -ks -X POST \\ -H \"Authorization: Basic ********\" \\ -d '" + JSON.stringify(commandBody) + "' \\ " + window.location.host + "/api/v1/commands")
     if (demoMode) {
-      updateScreen(window.fakeCommandProcessor(command))
+      updateScreen(window.demoCommandProcessor(command))
+      //debugger
       window.scrollTo(0, document.body.scrollHeight);
       document.querySelector('#prompt').focus()
       setRequestInProgress(false)
@@ -164,7 +172,7 @@ export default function Cli(props) {
 
 
   return (
-    <div id="outer-div">
+    <div id="outer-div" onClick={(event) => handleClick(event)}>
       <div id="inner-div" style={{padding: "0em 0em 1.5em 0em"}}>
         {
           demoMode && (

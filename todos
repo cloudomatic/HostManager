@@ -1,0 +1,5 @@
+Add Git to container
+Clicking on anywhere in the terminal window should set focus to the command prompt
+Blank commands should show newline
+Demo warning box should also run a command
+Fix problem when content initially displays at bottom of screen (touch a key to restore scroll level, but add a buffer at the bottom of the screen

@@ -255,18 +255,22 @@ export default function JsonFormEditor({json, defaultView="table", onChangeCallb
 
     const styles = {
       form: {
-        fontFamily: "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif"
+        fontFamily: "-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,Oxygen,Ubuntu,Cantarell,Fira Sans,Droid Sans,Helvetica Neue,sans-serif",
+        padding: "0.5em 0 0 0"
       },
       row: {
         padding: "0.2em 0em 0em 0em",
         fontSize: "0.7em",
       },
       rowHeader: {
-        backgroundColor: "none",
-        padding: "0.3em 0em 0.2em 0em",
-        width: "100%",
+        backgroundColor: "#727ea6",
+        padding: "0.3em 0em 0.4em 1.0em",
+        margin: "0.9em 0 0.2em 0",
+        width: "95%",
         fontSize: "0.7em",
-        fontWeight: "bold"
+        fontWeight: "bold",
+        color: "white",
+        borderRadius: "3px"
       },
       arrayElementHeader: {
         backgroundColor: "none",
@@ -283,7 +287,8 @@ export default function JsonFormEditor({json, defaultView="table", onChangeCallb
       inputField: {
         border: "1px solid " + "#212533",
         padding: "0em 0em 0.2em 0em",
-        margin: "0 0 0.2em 0"
+        margin: "0 0 0.2em 0",
+        borderRadius: "2px" 
       },
       textInput: { 
         padding: "0em 0 0.1em 0.4em",
@@ -354,7 +359,7 @@ export default function JsonFormEditor({json, defaultView="table", onChangeCallb
          <ToggleSwitch options = {[ "{ }", "table", "<form>" ]} defaultSelected={defaultView} onSelect={toggleView} />
        </div>
        { view == "table" &&
-         <div style={{ width: "100%", height: "100%", border: "0px solid black", backgroundColor: "green", overflow: "auto"}}>
+         <div style={{ width: "100%", height: "100%", border: "0px solid black", backgroundColor: "none", overflow: "auto"}}>
            {tableView()}
          </div>
        }

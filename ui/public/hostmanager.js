@@ -452,13 +452,57 @@ function getDemoHostFileSystem() {
 
 
 //
-// When in demo mode, we won't attempt to run an API server.  This function
-// will enable a user to see what the CLI function looks like
+// Local terminal commands
 //
-function fakeCommandProcessor(command) {
+function getTerminalCommands() {
+  return [ "help" ]
+}
+
+
+function getTerminalCommandHelp() {
+  return "\n" + 
+         "    set theme [light | dark]                            Set light/dark mode\n" + 
+         "    set font  <face> <size px>                          Set terminal font\n" + 
+         "\n" + 
+         "    browse    <url>                                     Open URL in a new tab\n" + 
+         "    clock     [size px]                                 Open clock visual\n" + 
+         "    close     [index]                                   Close an opened visual (index from top)\n" + 
+         "    curl      <url>                                     Perform a cUrl operation locally\n" + 
+         "    edit      <file>                                    Edit a file locally  (in a vi emulator) on the remote server\n" + 
+         "    download  <file>                                    Download a file from the remote host (i.e. \"save as\")\n" +
+         "    map       [search string]                           Open Open Street Maps\n" + 
+         "    stream    <url>                                     Stream a video feed\n" + 
+         "    view      <file> [size px] [refresh ms]             Preview a file on the remote host (refresh every n millis)\n" +
+         "    show      [index]                                   Show open visuals\n" + 
+         "\n"
+}
+
+
+//
+// Handle a terminal (local to the browser) command
+//
+function terminalCommandProcessor(command) {
+  if (command.trim().split(" ")[1] == "help") return getTerminalCommandHelp()
+}
+
+//
+// When in demo mode, we won't attempt to run an API server.  This function
+// will enable sample server responses
+//
+function demoCommandProcessor(command) {
   if (command.startsWith("pwd")) return "/\n"
   else if (command.startsWith("echo ")) return command.substring(5, command.length)
-  else if (command == "") return "\n"
+  else if (command == "") {
+    return ""
+  } else if (command.startsWith("help")) {
+    return "\n" +
+         "    term <command>                                  Run a local terminal command (run \"term help\" to see local terminal commands)\n" + 
+         "    show nodes                                      Show remote nodes running the Host Manager node agent and participating in this mesh\n" +
+         "    rsh <node-id> <command>                         Run a command on a remote node in that node's default shell\n" +
+         "    node view <node-id>                             Take a snapshot from a node's camera (if available)\n" +
+         "    node stream <node-id>                           Stream a node's primary camera (if available)\n" +
+    "\n"
+  } 
   else if (command.startsWith("ps")) {
     return "PID   USER     TIME  COMMAND\n" +
     "    1 root      0:00 sh\n" +
@@ -471,7 +515,6 @@ function fakeCommandProcessor(command) {
     "  311 root      0:00 /usr/bin/node /src/ui/node_modules/.bin/react-scripts start\n" +
     "  319 root      6:41 /usr/bin/node /node_modules/react-scripts/scripts/start.js\n" +
     "  502 root      0:00 ps\n" 
-
   } else if (command == "ls") {
     return "bin           err           home          media         node_modules  out           root          sbin          srv           tmp           var\n" + 
            "dev           etc           lib           mnt           opt           proc          run           src           sys           usr"
@@ -498,8 +541,10 @@ function fakeCommandProcessor(command) {
            "drwxrwxrwt    1 root     root          4096 Sep 17 13:08 tmp\n" +
            "drwxr-xr-x    1 root     root          4096 Sep 17 13:05 usr\n" +
            "drwxr-xr-x    1 root     root          4096 Sep 17 13:04 var\n"
+  } else if (["cat", "rm", "touch", "cd"].includes(command.trim().split(" ")[0])) {
+    return ""
   } else {
-    return "Unknown command: [" + command + "].  Note that when running in DEMO mode, there is no host runnning the command line API service.  Try commands like \"pwd\", \"ls\", etc."
+    return "Unknown command: [" + command + "].  Note that when running in DEMO mode, there is no host runnning the command line API service.  Try commands like \"pwd\", \"ls\", etc.  Run \"term help\" to see local terminal commands."
   }
   
 }
