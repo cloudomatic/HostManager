@@ -389,6 +389,14 @@ function getDemoHostFileSystem() {
               "group": "guest",
               "lastModified": "Nov 4 15:33"
             },
+            "Carmack.005.png": {
+              "type": "image",
+              "thumbnail": "Carmack.005.png",
+              "size": "958k",
+              "user": "guest",
+              "group": "guest",
+              "lastModified": "Nov 4 15:33"
+            }, 
             "Lex.001.png": {
               "type": "image",
               "thumbnail": "Lex.001.png",

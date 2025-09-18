@@ -4,6 +4,7 @@ project_name="host-manager"
 image_name=${project_name}:0.9
 # This can be "java" or "python"
 server_implementation="python"
+alpine_development_packages="bash python3 py3-pip jq curl git yarn openssh"
 
 #
 # Give the user some suggestions for running inside a dev container
@@ -220,12 +221,14 @@ setup_development_container() {
       mkdir /node_modules
       ln -s /node_modules /src/ui/node_modules 2>/dev/null
       apk update
-      apk add bash python3 py3-pip jq curl git yarn 
+      #apk add bash python3 py3-pip jq curl git yarn openssh
+      apk add $alpine_development_packages
       echo apk add openjdk17 maven
       pip install flask requests urllib3
       yarn install
       echo cd /src/server
       echo mvn package
+      alias ls='ls --color=never'
 }
 
 #

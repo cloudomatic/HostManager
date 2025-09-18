@@ -2,7 +2,7 @@ import * as React from 'react';
 import Icon from './Icon';
 import Text from './Text';
 
-export default function FilePreview({ filepath = "unknown", fileType = "unknown", previewText = "", fileSize = "?KB", thumbnail="" }) {
+export default function Image({ filepath = "unknown", fileType = "unknown", previewText = "", fileSize = "?KB", thumbnail="" }) {
 
   //const iconColor="rgb(57, 113, 189)"
   //const iconColor="rgb(69, 116, 181)"
@@ -24,19 +24,12 @@ export default function FilePreview({ filepath = "unknown", fileType = "unknown"
   
   const getFilePreviewDisplayableContent = (fileType, thumbnail, previewText) => {
     switch (fileType) {
-            case 'imagex':
+            case 'image':
               // Remove minHeight for the <img> here to show the normal size (don't stretch to fit the preview pane)
               return <div id="div-file-thumbnail-frame" style={{height: "40vh", display: "flex", backgroundColor: "none", overflow: "hidden"}}>
                   <img
                     src={thumbnail}
                     style={{justifyContent: "center", minHeight: "34vh", maxWidth: "30vw", margin: "auto", maxHeight: "34.5vh", width: "auto", height: "auto"}}
-                  />
-                </div>
-            case 'image':
-              return <div id="div-file-thumbnail-frame" style={{height: "40vh", display: "flex", backgroundColor: "none", overflow: "hidden"}}>
-                  <img
-                    src={thumbnail}
-                    style={{justifyContent: "center",minHeight: "34vh", maxWidth: "30vw", maxHeight: "39vh",  margin: "auto", width: "auto", height: "auto"}}
                   />
                 </div>
             case 'text':

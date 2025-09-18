@@ -18,7 +18,7 @@ export default function FileTile(props) {
             case 'image': 
               return <img 
                 src={thumbnail}
-                style={{margin: "auto", padding: "none", display: "block", maxWidth: "5.7em", justifyContent: "center", maxHeight: "2.3em"}}
+                style={{margin: "auto", padding: "none", display: "block", maxWidth: "5.7em", justifyContent: "center", height: "2.3em"}}
               /> 
             case 'folder':
               return <span style={{marginTop: "0.2em", padding: "none", display: "block"}}>
@@ -53,7 +53,7 @@ export default function FileTile(props) {
       <div id="div-file-icon" style={{padding: "0em 0em 0em 0em"}}>
         {(props.fileType !== undefined) && renderTileImage(props.fileType, props.thumbnail)}
       </div>
-      <div id="div-file-name" style={{ padding: "0em 0em 0em 0em", margin: "none"}}>
+      <div id="div-file-name" style={{ padding: "0em 0em 0em 0em", margin: "none"}} title={fileDisplayName}>
         <Text fontSize="0.8em">
           {window.truncateText(fileDisplayName, 12)}
         </Text>
